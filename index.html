@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>POS – Main Page</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { font-family: Arial; margin: 20px; }
+  h1, h2 { text-align: center; }
+  .menu, .cart { margin-bottom: 20px; }
+  button { margin: 5px; padding: 5px 10px; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { border: 1px solid #ddd; padding: 5px; text-align: left; }
+</style>
+</head>
+<body>
+
+<h1>Simple POS</h1>
+
+<div class="menu">
+  <h2>Menu</h2>
+  <div id="menuItems"></div>
+</div>
+
+<div class="cart">
+  <h2>Cart</h2>
+  <table id="cartTable">
+    <thead>
+      <tr><th>Item</th><th>Price</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <h3>Total: ₱<span id="total">0</span></h3>
+  <button id="goReceiptBtn">Go to Receipt</button>
+</div>
+
+<script>
+const menu = [
+  { name: "Burger", price: 100 },
+  { name: "Fries", price: 50 },
+  { name: "Soda", price: 30 },
+  { name: "Pizza", price: 150 },
+];
+
+const cart = [];
+const menuDiv = document.getElementById('menuItems');
+const cartTableBody = document.querySelector('#cartTable tbody');
+const totalSpan = document.getElementById('total');
+
+// Render menu buttons
+menu.forEach(item => {
+  const btn = document.createElement('button');
+  btn.textContent = `${item.name} - ₱${item.price}`;
+  btn.onclick = () => {
+    cart.push(item);
+    renderCart();
+  };
+  menuDiv.appendChild(btn);
+});
+
+// Render cart table
+function renderCart() {
+  cartTableBody.innerHTML = '';
+  let total = 0;
+  cart.forEach(item => {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${item.name}</td><td>₱${item.price}</td>`;
+    cartTableBody.appendChild(row);
+    total += item.price;
+  });
+  totalSpan.textContent = total;
+}
+
+// Go to receipt page
+document.getElementById('goReceiptBtn').addEventListener('click', () => {
+  if(cart.length === 0){
+    alert("Cart is empty!");
+    return;
+  }
+  // Save cart & total in localStorage
+  localStorage.setItem('cart', JSON.stringify(cart));
+  localStorage.setItem('total', totalSpan.textContent);
+
+  // Open receipt page
+  window.location.href = 'receipt.html';
+});
+</script>
+
+</body>
+</html>
