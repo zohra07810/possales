@@ -2,28 +2,34 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Receipt</title>
+<title>POS Receipt</title>
 
 <style>
-  /* Page setup for printing */
-@page {
-  size: A4;
-  margin: 0;
-}
+  /* Receipt styling for 80mm thermal printer (RawBT) */
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: monospace;
+    background: #fff;
+  }
 
- body {
-  margin: 0;
-  padding: 0;
-  font-family: monospace;
-}
+  .receipt {
+    width: 640px;           /* 80mm thermal width at 203 dpi */
+    max-width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
 
-.receipt {
-  width: 80mm;
-  padding: 5mm;
-  box-sizing: border-box;
-}
   h2 {
     text-align: center;
+    font-size: 20px;
+    margin: 5px 0;
+  }
+
+  p {
+    text-align: center;
+    font-size: 16px;
     margin: 5px 0;
   }
 
@@ -35,7 +41,7 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 16px;
   }
 
   td {
@@ -48,14 +54,14 @@
 
   .total {
     font-weight: bold;
-    font-size: 16px;
+    font-size: 18px;
   }
 
   button {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     margin-top: 10px;
-    font-size: 14px;
+    font-size: 16px;
     cursor: pointer;
   }
 
@@ -72,14 +78,16 @@
 
 <div class="receipt" id="receipt">
   <h2>MY RESTAURANT</h2>
-  <p style="text-align:center;">Thank you!</p>
+  <p>Thank you!</p>
 
   <div class="line"></div>
 
+  <!-- Receipt items -->
   <table id="items"></table>
 
   <div class="line"></div>
 
+  <!-- Total -->
   <table>
     <tr class="total">
       <td>Total</td>
@@ -91,21 +99,24 @@
 </div>
 
 <script>
+  // Get cart items from localStorage
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
   let total = 0;
 
   const itemsTable = document.getElementById("items");
 
+  // Render each item
   cart.forEach(item => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${item.name}</td>
-      <td class="right">₱${item.price}</td>
+      <td class="right">₱${item.price.toFixed(2)}</td>
     `;
     itemsTable.appendChild(row);
     total += item.price;
   });
 
+  // Render total
   document.getElementById("total").textContent = "₱" + total.toFixed(2);
 </script>
 
