@@ -6,19 +6,75 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body { font-family: Arial; margin: 20px; }
-  h1, h2 { text-align: center; }
+  h1, h2, h3 { text-align: center; }
+  .logo { display: block; margin: 0 auto 20px; max-width: 150px; }
   .menu, .cart { margin-bottom: 20px; }
   button { margin: 5px; padding: 5px 10px; cursor: pointer; }
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th, td { border: 1px solid #ddd; padding: 5px; text-align: left; }
+ table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+  th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  white-space: nowrap; /* keep cells in one line */
+}
+
+  .cart {
+  overflow-x: auto; /* allow horizontal scroll if needed */
+}
+
+  .qty-container { display: flex; align-items: center; justify-content: center; }
+  .qty-container button { padding: 3px 8px; margin: 0; font-size: 16px; cursor: pointer; }
+  .qty-container span { margin: 0 5px; min-width: 20px; text-align: center; display: inline-block; font-size: 16px; }
+
+  @media (max-width: 480px) {
+    .qty-container button { padding: 2px 6px; font-size: 14px; }
+    .qty-container span { font-size: 14px; min-width: 18px; }
+  }
+
+ @media (max-width: 480px) {
+  table {
+    font-size: 12px;
+  }
+
+  th, td {
+    padding: 3px;
+  }
+
+  th:nth-child(4) { font-size: 10px; } /* Upgrade */
+  th:nth-child(5) { font-size: 10px; } /* Action */
+  
+  .qty-container span { min-width: 15px; }
+  .qty-container button { padding: 1px 3px; font-size: 10px; }
+}
+
+ .backBtn {
+  display: block;            /* stays on its own line */
+  width: auto;               /* only as wide as the content */
+  background-color: #be3016; /* button color */
+  color: white;              /* text color */
+  border: none;
+  padding: 4px 10px;         /* smaller padding */
+  cursor: pointer;
+  border-radius: 5px;
+  margin-bottom: 10px;       /* space below button */
+  font-size: 14px;           /* smaller font */
+  text-align: left;          /* align text to left */
+}
+
+
+
 </style>
 </head>
 <body>
-
-<h1>Simple POS</h1>
+<img src="baigsLogo.png" alt="Baig's Logo" class="logo">
+<h1>Baig's POS</h1>
 
 <div class="menu">
-  <h2>Menu</h2>
+ <h2 style="color: #06812b;">Menu</h2>
   <div id="menuItems"></div>
 </div>
 
@@ -26,65 +82,285 @@
   <h2>Cart</h2>
   <table id="cartTable">
     <thead>
-      <tr><th>Item</th><th>Price</th></tr>
+      <tr>
+        <th>Item</th>
+        <th>QTY</th>
+        <th>Price</th>
+        <th>Up</th> <!-- new column -->
+        <th>Action</th>
+        </tr>
+
     </thead>
     <tbody></tbody>
   </table>
+   <br>
+  <!-- Discount input -->
+  <div style="margin-top: 10px;">
+    <label for="discount">Discount Input (20% of this will be applied): </label>
+    <input type="number" id="discount" value="0" min="0" style="width: 60px;">
+  </div>
+
+  <h4>Subtotal: ₱<span id="subtotal">0</span></h4>
+  <h4>Discount: ₱<span id="discountAmount">0</span></h4>
   <h3>Total: ₱<span id="total">0</span></h3>
   <button id="goReceiptBtn">Go to Receipt</button>
 </div>
 
-<script>
-const menu = [
-  { name: "Burger", price: 100 },
-  { name: "Fries", price: 50 },
-  { name: "Soda", price: 30 },
-  { name: "Pizza", price: 150 },
-];
+<!-- Upgrade Modal -->
+<div id="upgradeModal" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+">
+  <div style="
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 250px;
+    max-width: 90%;
+    text-align: center;
+  ">
+    <h3 id="upgradeTitle">Edit Item</h3>
+    <div style="margin-top: 10px;">
+      <label>Food Name:</label><br>
+      <input type="text" id="upgradeName" style="width: 90%; padding: 5px; margin-bottom: 10px;">
+      <br>
+      <label>Price:</label><br>
+      <input type="number" id="upgradePrice" style="width: 90%; padding: 5px; margin-bottom: 10px;">
+    </div>
+    <button id="saveUpgrade" style="margin-top: 10px; padding: 10px; width: 45%; cursor: pointer;">Save</button>
+    <button onclick="closeUpgradeModal()" style="margin-top: 10px; padding: 10px; width: 45%; cursor: pointer;">Cancel</button>
+  </div>
+</div>
 
-const cart = [];
+</div>
+
+<script>
+const menu = {
+  "Biryani": {
+    "Chicken": { "Small": 120, "Regular": 180 },
+    "Beef": { "Small": 130, "Regular": 200 }
+  },
+  "Kabsah": {
+    "Chicken": { "Small": 110, "Regular": 170 },
+    "Beef": { "Small": 125, "Regular": 190 }
+  },
+  "Shawarma": {
+    "Chicken": { "Small": 80, "Regular": 120 },
+    "Beef": { "Small": 90, "Regular": 140 }
+  }
+};
+
+let cart = [];
 const menuDiv = document.getElementById('menuItems');
 const cartTableBody = document.querySelector('#cartTable tbody');
+const subtotalSpan = document.getElementById('subtotal');
+const discountSpan = document.getElementById('discountAmount');
 const totalSpan = document.getElementById('total');
 
-// Render menu buttons
-menu.forEach(item => {
-  const btn = document.createElement('button');
-  btn.textContent = `${item.name} - ₱${item.price}`;
-  btn.onclick = () => {
-    cart.push(item);
-    renderCart();
-  };
-  menuDiv.appendChild(btn);
-});
+function renderCategories() {
+  menuDiv.innerHTML = '';
+  const title = document.createElement('h3');
+  title.textContent = 'Select Category';
+  menuDiv.appendChild(title);
 
-// Render cart table
-function renderCart() {
-  cartTableBody.innerHTML = '';
-  let total = 0;
-  cart.forEach(item => {
-    const row = document.createElement('tr');
-    row.innerHTML = `<td>${item.name}</td><td>₱${item.price}</td>`;
-    cartTableBody.appendChild(row);
-    total += item.price;
+  Object.keys(menu).forEach(category => {
+    const btn = document.createElement('button');
+    btn.textContent = category;
+    btn.onclick = () => renderVariants(category);
+    menuDiv.appendChild(btn);
   });
-  totalSpan.textContent = total;
 }
 
-// Go to receipt page
-document.getElementById('goReceiptBtn').addEventListener('click', () => {
-  if(cart.length === 0){
-    alert("Cart is empty!");
-    return;
-  }
-  // Save cart & total in localStorage
-  localStorage.setItem('cart', JSON.stringify(cart));
-  localStorage.setItem('total', totalSpan.textContent);
+function renderVariants(category) {
+  menuDiv.innerHTML = '';
+  const title = document.createElement('h3');
+  title.textContent = `Category: ${category}`;
+  menuDiv.appendChild(title);
 
-  // Open receipt page
+  const backBtn = document.createElement('button');
+  backBtn.className = 'backBtn';
+  backBtn.textContent = '⬅ Back';
+  backBtn.onclick = () => renderCategories();
+  menuDiv.appendChild(backBtn);
+
+  const variants = menu[category];
+  Object.keys(variants).forEach(variant => {
+    const btn = document.createElement('button');
+    btn.textContent = variant;
+    btn.onclick = () => renderSizes(category, variant);
+    menuDiv.appendChild(btn);
+  });
+}
+
+function renderSizes(category, variant) {
+  menuDiv.innerHTML = '';
+  const title = document.createElement('h3');
+  title.textContent = `Category: ${category} | Variant: ${variant}`;
+  menuDiv.appendChild(title);
+
+  const backBtn = document.createElement('button');
+  backBtn.className = 'backBtn';
+  backBtn.textContent = '⬅ Back';
+  backBtn.onclick = () => renderVariants(category);
+  menuDiv.appendChild(backBtn);
+
+  const sizes = menu[category][variant];
+  Object.keys(sizes).forEach(size => {
+    const price = sizes[size];
+    const btn = document.createElement('button');
+    btn.textContent = `${variant} (${size}) - ₱${price}`;
+    btn.onclick = () => {
+      cart.push({ name: `${category} - ${variant} (${size})`, price, qty: 1 });
+      renderCart();
+    };
+    menuDiv.appendChild(btn);
+  });
+}
+
+let currentUpgradeIndex = null; // track which cart item is being edited
+
+function openUpgradeModal(item, index) {
+  currentUpgradeIndex = index;
+  const modal = document.getElementById('upgradeModal');
+  document.getElementById('upgradeName').value = item.name;
+  document.getElementById('upgradePrice').value = item.price;
+  modal.style.display = 'flex';
+}
+
+function closeUpgradeModal() {
+  document.getElementById('upgradeModal').style.display = 'none';
+}
+
+// Save changes
+document.getElementById('saveUpgrade').addEventListener('click', () => {
+  if (currentUpgradeIndex !== null) {
+    const newName = document.getElementById('upgradeName').value.trim();
+    const newPrice = parseFloat(document.getElementById('upgradePrice').value) || 0;
+
+    cart[currentUpgradeIndex].name = newName || cart[currentUpgradeIndex].name;
+    cart[currentUpgradeIndex].price = newPrice;
+    renderCart();
+    closeUpgradeModal();
+  }
+});
+
+
+
+function renderCart() {
+  cartTableBody.innerHTML = '';
+  let subtotal = 0;
+
+  cart.forEach((item, index) => {
+    const row = document.createElement('tr');
+
+    // Item name
+    const nameCell = document.createElement('td');
+    nameCell.textContent = item.name;
+    row.appendChild(nameCell);
+
+    // QTY
+    const qtyCell = document.createElement('td');
+    const qtyContainer = document.createElement('div');
+    qtyContainer.className = 'qty-container';
+
+    const minusBtn = document.createElement('button');
+    minusBtn.textContent = '-';
+    minusBtn.onclick = () => {
+      if(item.qty > 1) { item.qty--; renderCart(); }
+    };
+
+    const qtySpan = document.createElement('span');
+    qtySpan.textContent = item.qty;
+
+    const plusBtn = document.createElement('button');
+    plusBtn.textContent = '+';
+    plusBtn.onclick = () => {
+      item.qty++;
+      renderCart();
+    };
+
+    qtyContainer.appendChild(minusBtn);
+    qtyContainer.appendChild(qtySpan);
+    qtyContainer.appendChild(plusBtn);
+    qtyCell.appendChild(qtyContainer);
+    row.appendChild(qtyCell);
+
+    // Price
+    const priceCell = document.createElement('td');
+    const itemTotal = item.price * item.qty;
+    priceCell.textContent = `₱${itemTotal}`;
+    row.appendChild(priceCell);
+
+
+    // Upgrade button
+const upgradeCell = document.createElement('td');
+const upgradeBtn = document.createElement('button');
+upgradeBtn.textContent = 'UP';
+upgradeBtn.style.backgroundColor = '#06812b';
+upgradeBtn.style.color = 'white';
+upgradeBtn.style.border = 'none';
+upgradeBtn.style.padding = '3px 6px';
+upgradeBtn.style.cursor = 'pointer';
+upgradeBtn.style.borderRadius = '3px';
+upgradeBtn.onclick = () => openUpgradeModal(item, index);
+upgradeCell.appendChild(upgradeBtn);
+row.appendChild(upgradeCell);
+
+
+
+    // Delete button
+    const deleteCell = document.createElement('td');
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.style.backgroundColor = '#ff4d4d';
+    deleteBtn.style.color = 'white';
+    deleteBtn.style.border = 'none';
+    deleteBtn.style.padding = '3px 6px';
+    deleteBtn.style.cursor = 'pointer';
+    deleteBtn.style.borderRadius = '3px';
+    deleteBtn.onclick = () => { cart.splice(index,1); renderCart(); };
+    deleteCell.appendChild(deleteBtn);
+    row.appendChild(deleteCell);
+
+    cartTableBody.appendChild(row);
+
+    subtotal += itemTotal;
+  });
+
+  // Apply 20% of discount input
+  const discountInput = document.getElementById('discount');
+  let discountValue = parseFloat(discountInput.value) || 0;
+  const discountAmount = discountValue * 0.2;
+  const total = Math.max(0, subtotal - discountAmount);
+
+  subtotalSpan.textContent = subtotal.toFixed(2);
+  discountSpan.textContent = discountAmount.toFixed(2);
+  totalSpan.textContent = total.toFixed(2);
+}
+
+// Re-render cart on discount change
+document.getElementById('discount').addEventListener('input', renderCart);
+
+// Go to receipt
+document.getElementById('goReceiptBtn').addEventListener('click', () => {
+  if(cart.length === 0) { alert("Cart is empty!"); return; }
+  localStorage.setItem('cart', JSON.stringify(cart));
+  
+  const discountValue = parseFloat(document.getElementById('discount').value) || 0;
+  const discountAmount = discountValue * 0.2;
+  localStorage.setItem('discount', discountAmount);
+
   window.location.href = 'receipt.html';
 });
-</script>
 
+// Initial menu render
+renderCategories();
+</script>
 </body>
 </html>
