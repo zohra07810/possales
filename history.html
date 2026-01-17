@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Receipt History</title>
+
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+h1 { text-align: center; margin: 0; }
+
+.table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 650px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: center;
+  font-size: 13px;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+button {
+  padding: 4px 8px;
+  margin: 2px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+  font-size: 16px;
+}
+
+.view-btn { background-color: #06812b; color: white; }
+.archive-btn { background-color: #ff4d4d; color: white; }
+.back-btn {
+  background-color: #555;
+  color: white;
+  margin-bottom: 15px;
+  padding: 5px 15px;
+}
+
+/* MOBILE / RESPONSIVE */
+@media (max-width: 480px) {
+  th, td { font-size: 11px; }
+  button { font-size: 12px; padding: 3px 6px; }
+}
+
+/* MODALS */
+#viewModal, #archiveModal, #reportModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 420px;
+  max-height: 80%;
+  overflow-y: auto;
+}
+
+.modal-header {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.modal-buttons {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.confirm-btn { background: #06812b; color: white; }
+.cancel-btn { background: #555; color: white; }
+
+/* HEADER */
+.main-header {
+  display: flex;
+  flex-direction: column;
+  background-color: #06812b;
+  color: white;
+  padding: 10px 15px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* logo left, hamburger right */
+}
+
+.header-left h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+/* HAMBURGER BUTTON */
+.hamburger {
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* DROPDOWN MENU */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 60px;
+  right: 15px;
+  background: white;
+  flex-direction: column;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+
+.mobile-menu.show {
+  display: flex;
+}
+
+/* Desktop: horizontal menu */
+@media(min-width: 768px){
+  .mobile-menu { 
+    position: static;
+    display: flex; 
+    flex-direction: row; 
+    margin-top:0; 
+    background: none;
+    box-shadow: none;
+    width: auto;
+  }
+  .mobile-menu button { 
+    margin: 0 5px; 
+    border: none; 
+    background: none;
+    color: white;
+  }
+}
+
+/* =====================
+   GENERAL
+===================== */
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f7f8fa;
+}
+
+/* =====================
+   TABLE CONTAINER
+===================== */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+  padding: 5px;
+}
+
+/* =====================
+   TABLE
+===================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+}
+
+th, td {
+  padding: 10px;
+  font-size: 14px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background: #f4f6f8;
+  font-weight: 600;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+/* =====================
+   BUTTONS
+===================== */
+button {
+  border: none;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.view-btn {
+  background: #2ecc71;
+  color: white;
+}
+
+.view-btn:hover {
+  background: #27ae60;
+}
+
+.delete-btn {
+  background: #e74c3c;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #c0392b;
+}
+
+.cancel-btn {
+  background: #7f8c8d;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #636e72;
+}
+
+/* =====================
+   DROPDOWNS
+===================== */
+select {
+  padding: 8px 10px;
+  margin: 4px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background: white;
+}
+
+/* =====================
+   MODAL
+===================== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 10px;
+}
+
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 15px;
+  animation: slideUp 0.25s ease;
+}
+
+.modal table {
+  min-width: unset;
+}
+
+.modal th, .modal td {
+  font-size: 13px;
+  padding: 8px;
+}
+
+/* =====================
+   HEADINGS
+===================== */
+h1, h2, h3 {
+  margin: 10px 0;
+  text-align: center;
+}
+
+/* =====================
+   MOBILE OPTIMIZATION
+===================== */
+@media (max-width: 600px) {
+
+  table {
+    min-width: 400px; /* allows horizontal scroll */
+  }
+
+  th, td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  button {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  select {
+    font-size: 13px;
+    width: 48%;
+    margin: 4px 1%;
+  }
+
+  .modal-content {
+    padding: 12px;
+  }
+}
+
+/* =====================
+   ANIMATION
+===================== */
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* =====================
+   HAMBURGER & MOBILE MENU
+===================== */
+.hamburger {
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 60px;
+  right: 15px;
+  background: white;
+  flex-direction: column;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+
+.mobile-menu.show {
+  display: flex;
+}
+
+.mobile-menu button {
+  background-color: #fff;
+  color: #06812b;
+  border: none;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.mobile-menu button:last-child {
+  border-bottom: none;
+}
+
+/* Desktop: horizontal menu */
+@media(min-width: 768px){
+  .mobile-menu { 
+    position: static;  
+    display: flex; 
+    flex-direction: row; 
+    margin-top:0; 
+    background: none;
+    box-shadow: none;
+    width: auto;
+  }
+  .mobile-menu button { 
+    margin: 0 5px; 
+    border: none; 
+    background: none;
+    color: white;
+  }
+}
+
+
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabaseClient = supabase.createClient(
+  "https://ismicrntffubdldeqpkh.supabase.co",
+  "sb_publishable_ZAiS4CtJOP6FbV7pmlAGWw__dsvwHqG"
+);
+</script>
+</head>
+
+<body>
+
+<header class="main-header">
+  <div class="header-left">
+    <h1>BAIG'S POS Dashboard</h1>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </div>
+</header>
+
+<!-- Floating dropdown menu -->
+<nav id="mobileMenu" class="mobile-menu">
+  <button onclick="showSection('receipts')">Receipt History</button>
+  <button onclick="showSection('expenses')">Add Expenses</button>
+  <button onclick="showSection('reports')">Sales & Expenses Records</button>
+  <button onclick="showSection('archivedReceipts')">Archived Receipts</button>
+
+</nav>
+
+
+<!-- SECTIONS -->
+<div id="receipts"><br>
+  <h1>Receipts History</h1>
+  <div style="text-align:center; margin:15px 0;">
+    <button class="back-btn" onclick="goBack()">⬅ Back to POS</button>
+  </div>
+
+  <!-- Payment Summary -->
+  <div id="paymentSummary" style="text-align:center; margin-top: 10px; font-weight: bold; font-size: 14px;"></div>
+
+  <!-- Receipts Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Date</th>
+          <th>Total</th>
+          <th>Payment</th>
+          <th>Service</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="historyTable"></tbody>
+    </table>
+  </div>
+
+  <!-- MODALS -->
+<div id="viewModal">
+  <div class="modal-content">
+    <div class="modal-header">Receipt Preview</div>
+    <div id="receiptPreview"></div>
+    <div class="modal-buttons">
+      <button class="cancel-btn" onclick="closeViewModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+
+  <div style="text-align:center; margin-top:15px;">
+    <button class="view-btn" onclick="openReportModal()">➕ Add All to Report</button>
+  </div>
+
+  <div id="reportModal">
+  <div class="modal-content">
+    <div class="modal-header">Add to Report</div>
+    <p style="text-align:center;">Are you sure you want to add <b>ALL receipts</b> to the report?</p>
+    <div class="modal-buttons">
+      <button class="confirm-btn" onclick="confirmAddToReport()">Yes</button>
+      <button class="cancel-btn" onclick="closeReportModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Archive Modal -->
+<div id="archiveModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">Archive Receipt</div>
+
+    <label style="font-size:13px;">Reason for archiving</label>
+    <input
+      type="text"
+      id="archiveReasonInput"
+      placeholder="e.g. Wrong order, refunded, void"
+      style="width:100%; padding:8px; margin-top:6px;"
+    />
+
+    <div class="modal-buttons">
+      <button class="confirm-btn" id="archiveConfirmBtn">Archive</button>
+      <button class="cancel-btn" onclick="closeArchiveModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+  
+<!-- Foodpanda & Grab Sales Input Card -->
+<div class="table-container" style="max-width:500px; margin:20px auto; padding:15px; background:#eb87f8;">
+  <h3 style="text-align:center; margin-bottom:15px;">🚀 Online Platform Sales</h3>
+
+  <!-- Input Form -->
+  <div style="display:flex; flex-direction:column; gap:10px; max-width:400px; margin:0 auto;">
+
+    <!-- Foodpanda -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <label for="foodpandaSales">Foodpanda Sales:</label>
+      <input type="number" id="foodpandaSales" placeholder="₱0.00" style="width:150px; padding:6px; border-radius:5px; border:1px solid #ccc;">
+    </div>
+
+     <!-- Calculated Total -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span>Total After Foodpanda 30%:</span>
+      <span id="foodpandaTotal">₱0.00</span>
+    </div>
+
+    <!-- Grab -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <label for="grabSales">Grab Sales:</label>
+      <input type="number" id="grabSales" placeholder="₱0.00" style="width:150px; padding:6px; border-radius:5px; border:1px solid #ccc;">
+    </div>
+
+   
+
+    <div style="text-align:center; margin-top:10px;">
+      <button class="view-btn" onclick="addDeliverySales()">Add to Records</button>
+    </div>
+
+  </div>
+</div>
+
+
+</div>
+
+<!-- ARCHIVED RECEIPTS -->
+<div id="archivedReceipts" style="display:none;">
+  <h2 style="text-align:center;">🗄️ Archived Receipts</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Date</th>
+          <th>Total</th>
+          <th>Payment</th>
+          <th>Service</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody id="archivedTable"></tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+<div id="reports" style="display:none; ">
+  <hr style="margin:30px 0;">
+  <h2 style="text-align:center;">📊 Sales Records</h2>
+
+  <!-- Filters -->
+  <div style="display:flex; justify-content:center; gap:10px; margin-bottom:15px; width:80%; margin-left:auto; margin-right:auto; flex-wrap:wrap;">
+  <select id="salesFilterYear" onchange="applySalesFilter()" style="width:45%; padding:6px; font-size:12px;">
+    <!-- years options -->
+  </select>
+
+  <select id="salesFilterMonth" onchange="applySalesFilter()" style="width:45%; padding:6px; font-size:12px;">
+    <option value="">All Months</option>
+    <option value="01">Jan</option>
+    <option value="02">Feb</option>
+    <option value="03">Mar</option>
+    <option value="04">Apr</option>
+    <option value="05">May</option>
+    <option value="06">Jun</option>
+    <option value="07">Jul</option>
+    <option value="08">Aug</option>
+    <option value="09">Sep</option>
+    <option value="10">Oct</option>
+    <option value="11">Nov</option>
+    <option value="12">Dec</option>
+  </select>
+</div>
+
+
+  <!-- Summary Table -->
+  <div class="table-container" id="salesReportContainer" style="display:none;background: #93e2a0;">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Total Amount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="salesReportSummaryBody"></tbody>
+    </table>
+  </div>
+
+  <!-- DELIVERY SALES (Foodpanda & Grab) Preview -->
+<div id="deliveryReports" style="display:none; margin-top:30px; background: #eb90fd;">
+  <hr style="margin:30px 0;">
+  <h2 style="text-align:center;">📦 Foodpanda & Grab Sales</h2>
+
+  <!-- Filters -->
+  <div style="display:flex; justify-content:center; gap:10px; margin-bottom:15px; width:80%; margin-left:auto; margin-right:auto; flex-wrap:wrap;">
+    <select id="deliveryFilterYear" onchange="applyDeliveryFilter()" style="width:45%; padding:6px; font-size:12px;">
+      <!-- Years will load dynamically -->
+    </select>
+
+    <select id="deliveryFilterMonth" onchange="applyDeliveryFilter()" style="width:45%; padding:6px; font-size:12px;">
+      <option value="">All Months</option>
+      <option value="01">Jan</option>
+      <option value="02">Feb</option>
+      <option value="03">Mar</option>
+      <option value="04">Apr</option>
+      <option value="05">May</option>
+      <option value="06">Jun</option>
+      <option value="07">Jul</option>
+      <option value="08">Aug</option>
+      <option value="09">Sep</option>
+      <option value="10">Oct</option>
+      <option value="11">Nov</option>
+      <option value="12">Dec</option>
+    </select>
+  </div>
+
+  <!-- Summary Table -->
+  <div class="table-container" id="deliveryReportContainer" style="display:none; background: #db69df;">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Foodpanda Net</th>
+          <th>Grab Net</th>
+        </tr>
+      </thead>
+      <tbody id="deliveryReportSummaryBody"></tbody>
+    </table>
+  </div>
+  </div>
+  <!-- Expenses Report Summary -->
+<div class="table-container" id="expensesReportContainer"
+     style="max-width:600px; margin:20px auto; display:none; background: #04649c;">
+  <h3 style="text-align:center;">📊 Expenses Summary Record</h3>
+
+  <!-- Filters -->
+<div style="display:flex; justify-content:center; gap:10px; margin-bottom:15px; width:80%; margin-left:auto; margin-right:auto; flex-wrap:wrap;">
+  <select id="filterYear" onchange="applyExpensesFilter()" style="width:45%; padding:6px; font-size:12px;">
+    <!-- Years will load here -->
+  </select>
+
+  <select id="filterMonth" onchange="applyExpensesFilter()" style="width:45%; padding:6px; font-size:12px;">
+    <option value="">All Months</option>
+    <option value="01">January</option>
+    <option value="02">February</option>
+    <option value="03">March</option>
+    <option value="04">April</option>
+    <option value="05">May</option>
+    <option value="06">June</option>
+    <option value="07">July</option>
+    <option value="08">August</option>
+    <option value="09">September</option>
+    <option value="10">October</option>
+    <option value="11">November</option>
+    <option value="12">December</option>
+  </select>
+</div>
+
+
+
+
+
+  <table style="background-color: #c9cfc8; border-radius: 8px; overflow: hidden; width: 100%;">
+  <thead >
+    <tr>
+      <th>Date</th>
+      <th>Total Amount</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="expensesReportSummaryBody">
+    <!-- Filled dynamically -->
+  </tbody>
+</table>
+</div>
+
+<div id="expensesViewModal" style="display:none;" class="modal">
+  <div class="modal-content">
+    <h3 style="text-align:center;">💸 Expenses Details</h3>
+
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Price</th>
+          <th>Payment</th>
+        </tr>
+      </thead>
+      <tbody id="expensesModalBody"></tbody>
+    </table>
+
+    <div style="text-align:center; margin-top:10px;">
+      <button class="cancel-btn" onclick="closeExpensesModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+
+</div>
+
+<!-- SALES MODAL -->
+<div id="salesViewModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3 style="text-align:center;">🧾 Sales Details</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Receipt</th>
+          <th>Service</th>
+          <th>Subtotal</th>
+          <th>Discount</th>
+          <th>Total</th>
+          <th>Payment</th>
+        </tr>
+      </thead>
+      <tbody id="salesModalBody"></tbody>
+    </table>
+
+    <div style="text-align:center; margin-top:10px;">
+      <button class="cancel-btn" onclick="closeSalesModal()">Close</button>
+    </div>
+  </div>
+
+  
+
+</div>
+
+<!-- Add Expenses Section -->
+<div id="expenses" style="display:none; margin-top: 20px;">
+  <h2 style="text-align:center;">💸 Add Expenses</h2>
+
+  <!-- Input Form -->
+  <div style="max-width:400px; margin:10px auto; text-align:center;">
+    <input 
+      type="text" 
+      id="expenseName" 
+      placeholder="Expense Item" 
+      style="width: 100%; padding:8px; margin-bottom:8px; border-radius:5px; border:1px solid #ccc;"
+    >
+    <input 
+      type="number" 
+      id="expensePrice" 
+      placeholder="Price" 
+      style="width: 80%; padding:8px; margin-bottom:8px; border-radius:5px; border:1px solid #ccc;"
+    >
+
+    <select 
+  id="expensePayment"
+  style="width: 80%; padding:8px; margin-bottom:8px; border-radius:5px; border:1px solid #ccc;"
+>
+  <option value="">Payment Method</option>
+  <option value="Cash">Cash</option>
+  <option value="GCash">GCash</option>
+  <option value="Bank">Bank</option>
+</select>
+
+    <button class="view-btn" onclick="addExpense()">Add Expense</button>
+  </div>
+
+  <!-- Preview Table -->
+  <div class="table-container" style="max-width:600px; margin:20px auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Price</th>
+          <th>Payment</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody id="expensesTableBody">
+        <!-- Dynamically filled by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Add to Report Button -->
+  <div style="text-align:center; margin-top:10px;">
+    <button class="view-btn" onclick="addExpensesToReport()">➕ Add All Expenses to Report</button>
+  </div>
+<br>
+ 
+
+
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+   let receipts = JSON.parse(localStorage.getItem("receipts")) || [];
+  let archiveIndex = null;
+
+  const historyTable = document.getElementById("historyTable");
+  const archivedTable = document.getElementById("archivedTable");
+
+  /* ============================
+     HELPERS
+  ============================ */
+  function formatPaymentShort(payment) {
+    let parts = [];
+    if (payment.cash > 0) parts.push("Cash");
+    if (payment.gcash > 0) parts.push("GCash");
+    if (payment.bank > 0) parts.push("Bank");
+    return parts.join(" + ") || "-";
+  }
+
+  /* ============================
+     ACTIVE RECEIPTS
+  ============================ */
+  function renderHistory() {
+    historyTable.innerHTML = "";
+
+    if (receipts.length === 0) {
+      historyTable.innerHTML =
+        `<tr><td colspan="6" style="text-align:center;color:#999;">No receipts found</td></tr>`;
+      document.getElementById("paymentSummary").textContent = "";
+      return;
+    }
+
+    let totalCash = 0, totalGCash = 0, totalBank = 0, totalSales = 0;
+
+    receipts.forEach(r => {
+      totalCash += Number(r.payment.cash) || 0;
+      totalGCash += Number(r.payment.gcash) || 0;
+      totalBank += Number(r.payment.bank) || 0;
+      totalSales += Number(r.total) || 0;
+    });
+
+    document.getElementById("paymentSummary").innerHTML = `
+      Total Sales Today: ₱${totalSales.toFixed(2)}<br><br>
+      Cash: ₱${totalCash.toFixed(2)} |
+      GCash: ₱${totalGCash.toFixed(2)} |
+      Bank: ₱${totalBank.toFixed(2)}
+    `;
+
+    receipts.forEach((r, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${r.id}</td>
+        <td>${r.date}</td>
+        <td>₱${Number(r.total).toFixed(2)}</td>
+        <td>${formatPaymentShort(r.payment)}</td>
+        <td>${r.service}</td>
+        <td>
+          <button class="view-btn">View</button>
+          <button class="archive-btn">Archive</button>
+        </td>
+      `;
+
+      historyTable.appendChild(row);
+
+      row.querySelector(".view-btn").onclick = () => viewReceipt(r);
+      row.querySelector(".archive-btn").onclick = () => openArchiveModal(index);
+    });
+  }
+
+  /* ============================
+     VIEW MODAL
+  ============================ */
+  function viewReceipt(r) {
+    let html = `
+      <strong>ID:</strong> ${r.id}<br>
+      <strong>Date:</strong> ${r.date}<br>
+      <strong>Service:</strong> ${r.service}<br><br>
+      <strong>Payment</strong><br>
+      Cash: ₱${(r.payment.cash || 0).toFixed(2)}<br>
+      GCash: ₱${(r.payment.gcash || 0).toFixed(2)}<br>
+      Bank: ₱${(r.payment.bank || 0).toFixed(2)}<br>
+      <hr>
+    `;
+
+    r.items.forEach(item => {
+      html += `${item.name} x${item.qty || 1} — ₱${(item.price * (item.qty || 1)).toFixed(2)}<br>`;
+    });
+
+    html += `
+      <hr>
+      Subtotal: ₱${r.subtotal.toFixed(2)}<br>
+      Discount: ₱${r.discount.toFixed(2)}<br>
+      <strong>Total: ₱${r.total.toFixed(2)}</strong>
+    `;
+
+    document.getElementById("receiptPreview").innerHTML = html;
+    document.getElementById("viewModal").style.display = "flex";
+  }
+
+  function closeViewModal() {
+    document.getElementById("viewModal").style.display = "none";
+  }
+
+  /* ============================
+     ARCHIVE MODAL
+  ============================ */
+  function openArchiveModal(index) {
+    archiveIndex = index;
+    document.getElementById("archiveReasonInput").value = "";
+    document.getElementById("archiveModal").style.display = "flex";
+  }
+
+  function closeArchiveModal() {
+    archiveIndex = null;
+    document.getElementById("archiveModal").style.display = "none";
+  }
+
+  /* ============================
+     ARCHIVE → SUPABASE
+  ============================ */
+  document.getElementById("archiveConfirmBtn").addEventListener("click", async () => {
+    const reason = document.getElementById("archiveReasonInput").value.trim();
+    if (!reason) {
+      alert("Please enter a reason.");
+      return;
+    }
+
+    const receipt = receipts.splice(archiveIndex, 1)[0];
+
+    const { error } = await supabaseClient
+      .from("archived_receipts")
+      .insert([{
+        receipt_id: receipt.id,
+        date: receipt.date,
+        total: receipt.total,
+        payment: receipt.payment,
+        service: receipt.service,
+        items: receipt.items,
+        subtotal: receipt.subtotal,
+        discount: receipt.discount,
+        archive_reason: reason
+      }]);
+
+    if (error) {
+      alert("Failed to archive receipt");
+      console.error(error);
+      return;
+    }
+
+    localStorage.setItem("receipts", JSON.stringify(receipts));
+    renderHistory();
+    renderArchived();
+    closeArchiveModal();
+  });
+
+  /* ============================
+     LOAD ARCHIVED FROM SUPABASE
+  ============================ */
+  async function renderArchived() {
+    archivedTable.innerHTML = "";
+
+    const { data, error } = await supabaseClient
+      .from("archived_receipts")
+      .select("*")
+      .order("archived_at", { ascending: false });
+
+    if (error) {
+      archivedTable.innerHTML =
+        `<tr><td colspan="6" style="color:red;">Failed to load archived receipts</td></tr>`;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      archivedTable.innerHTML =
+        `<tr><td colspan="6" style="text-align:center;color:#999;">No archived receipts</td></tr>`;
+      return;
+    }
+
+    data.forEach(r => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${r.receipt_id}</td>
+        <td>${r.date}</td>
+        <td>₱${Number(r.total).toFixed(2)}</td>
+        <td>${formatPaymentShort(r.payment)}</td>
+        <td>${r.service}</td>
+        <td>${r.archive_reason}</td>
+      `;
+      archivedTable.appendChild(row);
+    });
+  }
+
+  /* ============================
+     INIT
+  ============================ */
+  renderHistory();
+  renderArchived();
+
+  window.closeViewModal = closeViewModal;
+  window.closeArchiveModal = closeArchiveModal;
+
+});
+</script>
+
+
+
+
+
+<script>
+
+  function closeViewModal() { 
+  document.getElementById("viewModal").style.display = "none"; 
+}
+
+// Back to POS
+function goBack() {
+  window.location.href = "index.html";
+}
+
+function toggleMenu() {
+  const menu = document.getElementById("mobileMenu");
+  menu.classList.toggle("show");
+}
+
+
+function showSection(sectionId) {
+  const sections = ["receipts", "reports", "expenses","archivedReceipts"];
+
+  // Hide all sections
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+
+  // Show selected section
+  const selected = document.getElementById(sectionId);
+  if (selected) selected.style.display = "block";
+
+  // Close the menu
+  const menu = document.getElementById("mobileMenu");
+  menu.classList.remove("show"); // <- THIS now works
+}
+
+
+
+
+
+// REPORT LOGIC
+function openReportModal(){
+  if(receipts.length===0){ alert("No receipts to save."); return; }
+  document.getElementById("reportModal").style.display="flex";
+}
+function closeReportModal(){ document.getElementById("reportModal").style.display="none"; }
+async function confirmAddToReport() {
+  closeReportModal();
+
+  // Fetch receipts fresh from localStorage and parse
+  let receipts = JSON.parse(localStorage.getItem("receipts")) || [];
+
+  // Ensure we have an array
+  if (!Array.isArray(receipts) || receipts.length === 0) {
+    alert("No receipts to add.");
+    return;
+  }
+
+  // Build payload
+  const payload = receipts.map(r => ({
+    receipt_id: r.id,
+    receipt_date: r.date,
+    service: r.service,
+    items: r.items,
+    payment: r.payment,
+    subtotal: r.subtotal,
+    discount: r.discount,
+    total: r.total
+  }));
+
+  // Save to Supabase
+  const { error } = await supabaseClient
+    .from("sales_reports")
+    .upsert(payload, { onConflict: "receipt_id" });
+
+  if (error) {
+    console.error(error);
+    alert("Error saving report.");
+    return;
+  }
+
+  // Clear local data & refresh table
+  localStorage.removeItem("receipts");
+  receipts = [];
+  const historyTable = document.getElementById("historyTable");
+  historyTable.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#999;">No receipts found</td></tr>`;
+  document.getElementById("paymentSummary").textContent = "";
+
+  // Refresh report list if function exists
+  if (typeof loadReportDates === "function") {
+    await loadReportDates();
+  }
+
+  alert("All receipts successfully added to report ✅");
+}
+
+let allSalesData = [];
+
+/* ==============================
+   LOAD SALES
+================================ */
+async function loadSalesReport() {
+  const { data, error } = await supabaseClient
+    .from("sales_reports")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    document.getElementById("salesReportContainer").style.display = "none";
+    return;
+  }
+
+  allSalesData = data;
+
+  populateSalesYearFilter(data);
+  setSalesDefaultMonth();
+  applySalesFilter();
+
+  // Show the report table but keep the section hidden until menu clicked
+  document.getElementById("salesReportContainer").style.display = "block";
+  // Do NOT auto-show the whole section:
+  // document.getElementById("reports").style.display = "block"; <- remove this
+}
+
+
+/* ==============================
+   YEAR FILTER
+================================ */
+function populateSalesYearFilter(data) {
+  const yearSelect = document.getElementById("salesFilterYear");
+  yearSelect.innerHTML = "";
+
+  const years = [...new Set(
+    data.map(s => new Date(s.created_at).getFullYear())
+  )].sort((a, b) => b - a);
+
+  years.forEach(y => {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    yearSelect.appendChild(opt);
+  });
+
+  yearSelect.value = new Date().getFullYear();
+}
+
+/* ==============================
+   DEFAULT MONTH
+================================ */
+function setSalesDefaultMonth() {
+  const m = String(new Date().getMonth() + 1).padStart(2, "0");
+  document.getElementById("salesFilterMonth").value = m;
+}
+
+/* ==============================
+   APPLY FILTER
+================================ */
+function applySalesFilter() {
+  const year = document.getElementById("salesFilterYear").value;
+  const month = document.getElementById("salesFilterMonth").value;
+
+  let filtered = [...allSalesData];
+
+  if (year) {
+    filtered = filtered.filter(s =>
+      new Date(s.created_at).getFullYear().toString() === year
+    );
+  }
+
+  if (month) {
+    filtered = filtered.filter(s =>
+      String(new Date(s.created_at).getMonth() + 1).padStart(2, "0") === month
+    );
+  }
+
+  renderSalesSummary(filtered);
+}
+
+/* ==============================
+   SUMMARY TABLE
+================================ */
+function renderSalesSummary(data) {
+  const tbody = document.getElementById("salesReportSummaryBody");
+  tbody.innerHTML = "";
+
+  if (data.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="3" style="text-align:center;color:#888;">
+          No sales found
+        </td>
+      </tr>`;
+    return;
+  }
+
+  // Group by DATE
+  const grouped = {};
+  data.forEach(s => {
+    const dateKey = s.created_at.split("T")[0];
+    if (!grouped[dateKey]) grouped[dateKey] = [];
+    grouped[dateKey].push(s);
+  });
+
+  Object.keys(grouped)
+    .sort((a, b) => new Date(b) - new Date(a))
+    .forEach(date => {
+
+      const total = grouped[date].reduce(
+        (sum, s) => sum + Number(s.total), 0
+      );
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${formatDate(date)}</td>
+        <td><strong>₱${total.toFixed(2)}</strong></td>
+        <td>
+          <button class="view-btn"
+            onclick='openSalesModal(${JSON.stringify(grouped[date])})'>
+            View
+          </button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+}
+
+/* ==============================
+   MODAL
+================================ */
+function openSalesModal(sales) {
+  const tbody = document.getElementById("salesModalBody");
+  tbody.innerHTML = "";
+
+  sales.forEach(s => {
+    const payment = [];
+    if (s.payment.cash > 0) payment.push("Cash");
+    if (s.payment.gcash > 0) payment.push("GCash");
+    if (s.payment.bank > 0) payment.push("Bank");
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${s.receipt_id || "-"}</td>
+      <td>${s.service || "-"}</td>
+      <td>₱${Number(s.subtotal).toFixed(2)}</td>
+      <td>₱${Number(s.discount).toFixed(2)}</td>
+      <td><strong>₱${Number(s.total).toFixed(2)}</strong></td>
+      <td>${payment.length > 0 ? payment.join(", ") : "-"}</td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  document.getElementById("salesViewModal").style.display = "flex";
+}
+
+function closeSalesModal() {
+  document.getElementById("salesViewModal").style.display = "none";
+}
+
+/* ==============================
+   DATE FORMAT (SAFE)
+================================ */
+function formatDate(dateStr) {
+  return new Date(dateStr + "T00:00:00")
+    .toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+}
+
+/* ==============================
+   INIT
+================================ */
+loadSalesReport();
+
+// Local array to hold expenses before sending
+let expenses = [];
+
+// ----------------------------
+// Render local expenses table
+// ----------------------------
+function renderExpenses() {
+  const tbody = document.getElementById("expensesTableBody");
+  tbody.innerHTML = "";
+
+  if (expenses.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" style="text-align:center;color:#999;">
+          No expenses added
+        </td>
+      </tr>`;
+    return;
+  }
+
+  expenses.forEach((exp, index) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${exp.item}</td>
+      <td>₱${Number(exp.price).toFixed(2)}</td>
+      <td>${exp.payment}</td>
+      <td>
+        <button class="delete-btn" onclick="removeExpense(${index})">
+          Delete
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// ----------------------------
+// Add a new expense locally
+// ----------------------------
+function addExpense() {
+  const nameInput = document.getElementById("expenseName");
+  const priceInput = document.getElementById("expensePrice");
+  const paymentInput = document.getElementById("expensePayment");
+
+  const item = nameInput.value.trim();
+  const price = parseFloat(priceInput.value);
+  const payment = paymentInput.value;
+
+  if (!item || isNaN(price) || !payment) {
+    alert("Please fill in item, price, and payment method.");
+    return;
+  }
+
+  expenses.push({ item, price, payment });
+  renderExpenses();
+
+  // Clear input fields
+  nameInput.value = "";
+  priceInput.value = "";
+  paymentInput.value = "";
+}
+
+// ----------------------------
+// Remove a local expense
+// ----------------------------
+function removeExpense(index) {
+  expenses.splice(index, 1);
+  renderExpenses();
+}
+
+// ----------------------------
+// Add all expenses to Supabase
+// ----------------------------
+async function addExpensesToReport() {
+  if (expenses.length === 0) {
+    alert("No expenses to add.");
+    return;
+  }
+
+  const payload = expenses.map(exp => ({
+    item: exp.item,
+    price: exp.price,
+    payment: exp.payment
+  }));
+
+  const { error } = await supabaseClient
+    .from("expenses_reports")
+    .insert(payload);
+
+  if (error) {
+    console.error(error);
+    alert("Error saving expenses.");
+    return;
+  }
+
+  expenses = [];
+  renderExpenses();
+
+  await loadExpensesReport();
+  alert("Expenses added successfully ✅");
+}
+
+// ==============================
+// LOAD EXPENSES REPORT
+// ==============================
+let allExpensesData = [];
+
+async function loadExpensesReport() {
+  const { data, error } = await supabaseClient
+    .from("expenses_reports")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Supabase error:", error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    document.getElementById("expensesReportContainer").style.display = "none";
+    return;
+  }
+
+  allExpensesData = data;
+
+  populateYearFilter(data);
+  setDefaultMonth();
+  applyExpensesFilter();
+
+  document.getElementById("expensesReportContainer").style.display = "block";
+}
+
+/* ==============================
+   YEAR DROPDOWN
+================================ */
+function populateYearFilter(data) {
+  const yearSelect = document.getElementById("filterYear");
+  yearSelect.innerHTML = "";
+
+  const years = [...new Set(
+    data.map(e => new Date(e.created_at).getFullYear())
+  )].sort((a, b) => b - a);
+
+  years.forEach(year => {
+    const opt = document.createElement("option");
+    opt.value = year;
+    opt.textContent = year;
+    yearSelect.appendChild(opt);
+  });
+
+  yearSelect.value = new Date().getFullYear();
+}
+
+/* ==============================
+   DEFAULT MONTH = CURRENT
+================================ */
+function setDefaultMonth() {
+  const month = String(new Date().getMonth() + 1).padStart(2, "0");
+  document.getElementById("filterMonth").value = month;
+}
+
+/* ==============================
+   APPLY FILTERS
+================================ */
+function applyExpensesFilter() {
+  const year = document.getElementById("filterYear").value;
+  const month = document.getElementById("filterMonth").value;
+
+  let filtered = [...allExpensesData];
+
+  if (year) {
+    filtered = filtered.filter(e =>
+      new Date(e.created_at).getFullYear().toString() === year
+    );
+  }
+
+  if (month) {
+    filtered = filtered.filter(e =>
+      String(new Date(e.created_at).getMonth() + 1).padStart(2, "0") === month
+    );
+  }
+
+  renderExpensesSummary(filtered);
+}
+
+/* ==============================
+   SUMMARY TABLE
+================================ */
+function renderExpensesSummary(data) {
+  const tbody = document.getElementById("expensesReportSummaryBody");
+  tbody.innerHTML = "";
+
+  if (data.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="3" style="text-align:center;color:#888;">
+          No expenses found
+        </td>
+      </tr>`;
+    return;
+  }
+
+  // Group by DATE (YYYY-MM-DD)
+  const grouped = {};
+  data.forEach(e => {
+    const dateKey = e.created_at.split("T")[0];
+    if (!grouped[dateKey]) grouped[dateKey] = [];
+    grouped[dateKey].push(e);
+  });
+
+  Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a))
+    .forEach(date => {
+
+      const total = grouped[date].reduce(
+        (sum, e) => sum + Number(e.price), 0
+      );
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${formatDate(date)}</td>
+        <td><strong>₱${total.toFixed(2)}</strong></td>
+        <td>
+          <button class="view-btn"
+            onclick='openExpensesModal(${JSON.stringify(grouped[date])})'>
+            View
+          </button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+}
+
+/* ==============================
+   MODAL VIEW
+================================ */
+function openExpensesModal(expenses) {
+  const tbody = document.getElementById("expensesModalBody");
+  tbody.innerHTML = "";
+
+  expenses.forEach(e => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${e.item}</td>
+      <td>₱${Number(e.price).toFixed(2)}</td>
+      <td>${e.payment}</td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  document.getElementById("expensesViewModal").style.display = "flex";
+}
+
+function closeExpensesModal() {
+  document.getElementById("expensesViewModal").style.display = "none";
+}
+
+/* ==============================
+   DATE FORMAT FIX (NO INVALID)
+================================ */
+function formatDate(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+}
+
+/* ==============================
+   INIT
+================================ */
+loadExpensesReport();
+
+
+// Update Foodpanda total after 30% commission
+document.getElementById("foodpandaSales").addEventListener("input", () => {
+  const value = parseFloat(document.getElementById("foodpandaSales").value) || 0;
+  const total = value * 0.7; // minus 30%
+  document.getElementById("foodpandaTotal").innerText = `₱${total.toFixed(2)}`;
+});
+
+// Function to add delivery sales to Supabase
+async function addDeliverySales() {
+  const foodpanda = parseFloat(document.getElementById("foodpandaSales").value) || 0;
+  const grab = parseFloat(document.getElementById("grabSales").value) || 0;
+
+  if(foodpanda <= 0 && grab <= 0) {
+    alert("Please enter at least one value for Foodpanda or Grab.");
+    return;
+  }
+
+  const payload = [];
+
+  // Foodpanda entry (30% deduction)
+  if(foodpanda > 0){
+    payload.push({
+      platform: "Foodpanda",
+      gross_amount: foodpanda,
+      net_amount: foodpanda * 0.7, // minus 30%
+      date: new Date() // optional: you can use specific date input
+    });
+  }
+
+  // Grab entry (full amount)
+  if(grab > 0){
+    payload.push({
+      platform: "Grab",
+      gross_amount: grab,
+      net_amount: grab,
+      date: new Date()
+    });
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("delivery_sales")
+      .insert(payload);
+
+    if(error){
+      console.error(error);
+      alert("Error saving delivery sales.");
+      return;
+    }
+
+    alert("Delivery sales added ✅");
+
+    // Clear inputs
+    document.getElementById("foodpandaSales").value = "";
+    document.getElementById("grabSales").value = "";
+    document.getElementById("foodpandaTotal").innerText = "₱0.00";
+
+  
+
+  } catch(err){
+    console.error(err);
+    alert("Unexpected error occurred.");
+  }
+}
+
+let allDeliveryData = [];
+
+// Load delivery sales from Supabase
+async function loadDeliveryReport() {
+  const { data, error } = await supabaseClient
+    .from("delivery_sales")
+    .select("*")
+    .order("date", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  allDeliveryData = data || [];
+
+  populateDeliveryYearFilter(allDeliveryData);
+  setDeliveryDefaultMonth();
+  applyDeliveryFilter();
+
+  document.getElementById("deliveryReportContainer").style.display = "block";
+  document.getElementById("deliveryReports").style.display = "block";
+}
+
+// Populate year filter dynamically
+function populateDeliveryYearFilter(data) {
+  const years = [...new Set(data.map(d => new Date(d.date).getFullYear()))].sort((a,b)=>b-a);
+  const yearSelect = document.getElementById("deliveryFilterYear");
+  yearSelect.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join("");
+}
+
+// Set default month to all
+function setDeliveryDefaultMonth() {
+  document.getElementById("deliveryFilterMonth").value = "";
+}
+
+// Apply filter and show summary table
+function applyDeliveryFilter() {
+  const year = document.getElementById("deliveryFilterYear").value;
+  const month = document.getElementById("deliveryFilterMonth").value;
+
+  const filtered = allDeliveryData.filter(d => {
+    const date = new Date(d.date);
+    return (!year || date.getFullYear() == year) &&
+           (!month || (date.getMonth()+1).toString().padStart(2,"0") === month);
+  });
+
+  const summaryBody = document.getElementById("deliveryReportSummaryBody");
+  summaryBody.innerHTML = "";
+
+  if(filtered.length === 0) {
+    summaryBody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#999;">No delivery sales found</td></tr>`;
+    return;
+  }
+
+  // Group by date
+  const grouped = {};
+  filtered.forEach(d => {
+    const dateStr = new Date(d.date).toLocaleDateString("en-US", { year:"numeric", month:"long", day:"numeric" });
+    if(!grouped[dateStr]) grouped[dateStr] = { foodpanda: 0, grab: 0 };
+    if(d.platform.toLowerCase() === "foodpanda") grouped[dateStr].foodpanda += Number(d.net_amount);
+    if(d.platform.toLowerCase() === "grab") grouped[dateStr].grab += Number(d.net_amount);
+  });
+
+  Object.keys(grouped).forEach(dateStr => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${dateStr}</td>
+      <td>₱${grouped[dateStr].foodpanda.toFixed(2)}</td>
+      <td>₱${grouped[dateStr].grab.toFixed(2)}</td>
+    `;
+    summaryBody.appendChild(row);
+  });
+}
+
+
+
+
+// Call after page loads
+loadDeliveryReport();
+
+</script>
+
+</body>
+</html>
