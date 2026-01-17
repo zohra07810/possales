@@ -2,25 +2,166 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>POS Receipt</title>
 <style>
-  body { margin: 0; padding: 0; font-family: monospace; background: #fff; }
-  .receipt { width: 640px; max-width: 100%; padding: 10px; box-sizing: border-box; font-size: 16px; }
-  h2 { text-align: center; font-size: 20px; margin: 5px 0; }
-  p { text-align: center; font-size: 16px; margin: 5px 0; }
-  .line { border-top: 1px dashed #000; margin: 8px 0; }
-  table { width: 100%; border-collapse: collapse; font-size: 16px; }
-  td { padding: 4px 0; }
-  .right { text-align: right; }
-  .total { font-weight: bold; font-size: 18px; }
-  button { width: 100%; padding: 10px; margin-top: 10px; font-size: 16px; cursor: pointer; }
-  @media print { button { display: none; } }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: monospace;
+  background: #f5f5f5;
+}
+
+/* SCREEN DISPLAY */
+.receipt {
+  width: 100%;
+  max-width: 420px;
+  margin: 20px auto;
+  padding: 16px;
+  background: #fff;
+  box-sizing: border-box;
+  font-size: 18px;
+}
+
+h2 { text-align: center; font-size: 26px; margin: 8px 0; }
+p { text-align: center; font-size: 18px; margin: 5px 0; }
+.line { border-top: 1px dashed #000; margin: 10px 0; }
+
+table { width: 100%; border-collapse: collapse; font-size: 18px; }
+td { padding: 6px 0; }
+.right { text-align: right; }
+.total { font-weight: bold; font-size: 22px; }
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 15px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* PRINT STYLES */
+@media print {
+  body { background: #fff; }
+  .receipt {
+    width: 80mm;
+    max-width: 80mm;
+    padding: 6px;
+    font-size: 12px;
+    margin: 0;
+  }
+  h2 { font-size: 16px; }
+  p, table { font-size: 12px; }
+  .total { font-size: 14px; }
+  button { display: none; }
+}
+
+/* HEADER */
+.header { text-align: center; margin-bottom: 15px; }
+.logo { max-width: 80px; margin-bottom: 8px; }
+.store-info { font-size: 16px; margin-top: 3px; }
+
+.back-btn {
+  width: auto;
+  padding: 4px 10px;
+  margin: 6px auto 0;
+  font-size: 16px;
+  cursor: pointer;
+  color: #f5f5f5;
+  background: #c91212;
+  border: none;
+  border-radius: 5px;
+}
+
+/* SAVE MODAL */
+#saveModal {
+  display: none;
+  position: fixed; top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+#saveModalContent {
+  background: #06812b;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 350px;
+  text-align: center;
+}
+#saveModalContent select {
+  width: 90%;
+  padding: 5px;
+  margin: 5px 0;
+  font-size: 16px;
+}
+#saveModalContent button {
+  padding: 6px 12px;
+  margin: 5px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+}
+#saveYes { background: white; color: #06812b; }
+#saveCancel { background: #555; color: white; }
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.payment-row span {
+  font-size: 14px;
+}
+
+.payment-row input {
+  width: 90px;
+  padding: 4px;
+  font-size: 14px;
+}
+
+/* Waitlist Modal CSS */
+#waitlistModal {
+  display: none; /* hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 10000; /* high value to appear above everything */
+  justify-content: center;
+  align-items: center;
+}
+
+
+#waitlistModalContent {
+  background: #056622;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 350px;
+  text-align: center;
+}
+
 </style>
 </head>
 <body>
 
 <div class="receipt">
-  <h2>MY RESTAURANT</h2>
+  <div class="header">
+    <img src="baigsLogo.png" alt="Logo" class="logo">
+    <h2>Baig's Arab-Pakistani-Indian Restaurant</h2>
+    <div class="store-info">0945-597-0707</div>
+    <div class="store-info">B3A L3788 Brgy. Sta.Lucia Dasmariñas City Cavite</div>
+  </div>
+
   <p>Thank you!</p>
   <div class="line"></div>
 
@@ -43,13 +184,103 @@
     </tr>
   </table>
 
-  <button onclick="window.print()">Print Receipt</button>
+  <button onclick="window.print()" style=" background: #0c4b04; color: #f5f5f5;">Print Receipt</button><br>
+
+  <div style="max-width: 400px; margin: 0 auto; text-align: center; padding: 4px 10px; background: #f8f8f8; border-radius: 8px;">
+    <button onclick="openSaveModal()" style="padding: 8px 16px; font-size: 16px;">💾 Save Receipt</button>
+  </div><br>
+
+  <div style="max-width: 400px; margin: 0 auto; text-align: center; padding: 4px 10px; background: #f8f8f8; border-radius: 8px;">
+  <button onclick="openWaitlistModal()" style="padding: 8px 16px; font-size: 16px;">⏳ Add to Waitlist</button>
 </div>
 
+
+  <div style="text-align:center;">
+    <button class="back-btn" onclick="goBack()">⬅ Back to POS</button>
+  </div>
+</div>
+
+<!-- Save Modal -->
+<div id="saveModal">
+  <div id="saveModalContent">
+
+      <div style="margin-bottom:10px; font-size:16px; font-weight:bold; color: #e6ff07;">
+    Total to Pay: ₱<span id="totalDue">0.00</span>
+  </div>
+
+  <div style="margin-top:12px; padding:8px; background:#056622; border-radius:6px;">
+  <div style="font-size:14px;">
+    <strong>Cash Change Calculator</strong>
+  </div>
+
+  <div style="margin-top:6px;">
+    Cash Given: ₱
+    <input type="number" id="cashGiven" placeholder="0.00"
+           style="width:90px; padding:4px; font-size:14px;">
+  </div>
+
+  <div style="margin-top:6px; font-size:15px;">
+    Change: ₱<span id="changeAmount">0.00</span>
+  </div>
+</div><br>
+
+    <label>Payment Breakdown:</label>
+
+    <div class="payment-row">
+      <span>Cash</span>
+      <input type="number" id="payCash" placeholder="0.00">
+    </div>
+
+    <div class="payment-row">
+      <span>GCash</span>
+      <input type="number" id="payGCash" placeholder="0.00">
+    </div>
+
+    <div class="payment-row">
+      <span>Bank</span>
+      <input type="number" id="payBank" placeholder="0.00">
+    </div>
+
+    <label style="margin-top:10px;">Service Type:</label>
+    <select id="serviceSelect">
+      <option value="Dine-in">Dine-in</option>
+      <option value="Take-out">Take-out</option>
+      <option value="Pickup">Pickup</option>
+      <option value="Delivery">Delivery</option>
+    </select>
+
+    <div style="margin-top:10px;">
+      <strong>Total Paid: ₱<span id="paidTotal">0.00</span></strong>
+    </div>
+
+    
+
+
+    <button id="saveYes">Save</button>
+    <button id="saveCancel">Cancel</button>
+  </div>
+</div>
+
+<!-- Waitlist Customer Modal -->
+<div id="waitlistModal">
+  <div id="waitlistModalContent">
+    <h3>Waitlist Customer</h3>
+    <div style="margin:10px 0;">
+      <label>Customer Name:</label><br>
+      <input type="text" id="waitlistName" placeholder="Enter name" style="width:90%; padding:6px; font-size:16px;">
+    </div>
+    <button id="waitlistSave">Add to Waitlist</button>
+    <button id="waitlistCancel">Cancel</button>
+  </div>
+</div>
+
+
+
+
 <script>
+// Load cart & render
 const cart = JSON.parse(localStorage.getItem("cart")) || [];
 const discountAmount = parseFloat(localStorage.getItem("discount")) || 0;
-
 const itemsTable = document.getElementById("items");
 let subtotal = 0;
 
@@ -66,7 +297,148 @@ const total = Math.max(0, subtotal - discountAmount);
 document.getElementById("subtotal").textContent = "₱" + subtotal.toFixed(2);
 document.getElementById("discountText").textContent = "-₱" + discountAmount.toFixed(2);
 document.getElementById("total").textContent = "₱" + total.toFixed(2);
-</script>
 
+// Go back to POS
+function goBack() {
+  window.location.href = "index.html";
+}
+
+const cashGivenInput = document.getElementById("cashGiven");
+const changeAmountSpan = document.getElementById("changeAmount");
+const totalDueSpan = document.getElementById("totalDue");
+
+// Update change based on cash given vs total to pay
+function updateChange() {
+  const totalDue = parseFloat(totalDueSpan.textContent) || 0;
+  const cashGiven = parseFloat(cashGivenInput.value) || 0;
+
+  let change = cashGiven - totalDue;
+  if (change < 0) change = 0;
+
+  changeAmountSpan.textContent = change.toFixed(2);
+
+  // Optional: color red if underpaid, green if enough
+  changeAmountSpan.style.color = cashGiven >= totalDue ? "lime" : "red";
+}
+
+// Event listener
+cashGivenInput.addEventListener("input", updateChange);
+
+// --- Save modal ---
+
+function openSaveModal() {
+  totalDueSpan.textContent = total.toFixed(2);
+  document.getElementById("payCash").value = "";
+  document.getElementById("payGCash").value = "";
+  document.getElementById("payBank").value = "";
+  document.getElementById("paidTotal").textContent = "0.00";
+  cashGivenInput.value = "";
+  changeAmountSpan.textContent = "0.00";
+  document.getElementById("saveModal").style.display = "flex";
+}
+
+function closeSaveModal() {
+  document.getElementById("saveModal").style.display = "none";
+}
+
+function getPaymentTotal() {
+  const cash = parseFloat(document.getElementById("payCash").value) || 0;
+  const gcash = parseFloat(document.getElementById("payGCash").value) || 0;
+  const bank = parseFloat(document.getElementById("payBank").value) || 0;
+  return cash + gcash + bank;
+}
+
+// Live update total paid
+["payCash","payGCash","payBank"].forEach(id => {
+  document.getElementById(id).addEventListener("input", () => {
+    document.getElementById("paidTotal").textContent =
+      getPaymentTotal().toFixed(2);
+  });
+});
+
+// Save receipt
+document.getElementById("saveYes").addEventListener("click", () => {
+  const paidTotal = getPaymentTotal();
+  if (paidTotal !== total) {
+    alert("Payment amount must equal total ₱" + total.toFixed(2));
+    return;
+  }
+
+  const receiptObj = {
+    id: Date.now(),
+    date: new Date().toLocaleString(),
+    items: cart,
+    subtotal,
+    discount: discountAmount,
+    total,
+    payment: {
+      cash: parseFloat(document.getElementById("payCash").value) || 0,
+      gcash: parseFloat(document.getElementById("payGCash").value) || 0,
+      bank: parseFloat(document.getElementById("payBank").value) || 0
+    },
+    service: document.getElementById("serviceSelect").value
+  };
+
+  let receipts = JSON.parse(localStorage.getItem("receipts")) || [];
+  receipts.push(receiptObj);
+  localStorage.setItem("receipts", JSON.stringify(receipts));
+
+  closeSaveModal();
+  window.location.href = "history.html";
+});
+
+document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
+
+// --- Waitlist Modal ---
+const waitlistModal = document.getElementById("waitlistModal");
+const waitlistNameInput = document.getElementById("waitlistName");
+const waitlistSaveBtn = document.getElementById("waitlistSave");
+const waitlistCancelBtn = document.getElementById("waitlistCancel");
+
+function openWaitlistModal() {
+  waitlistNameInput.value = "";
+  waitlistModal.style.display = "flex";
+}
+
+function closeWaitlistModal() {
+  waitlistModal.style.display = "none";
+}
+
+waitlistCancelBtn.addEventListener("click", closeWaitlistModal);
+
+waitlistSaveBtn.addEventListener("click", () => {
+  const customerName = waitlistNameInput.value.trim();
+  if (!customerName) {
+    alert("Please enter customer name!");
+    return;
+  }
+
+  const waitlistObj = {
+    id: Date.now(),
+    date: new Date().toLocaleString(),
+    customerName,
+    items: cart,
+    subtotal,
+    discount: discountAmount,
+    total,
+    payment: {
+      cash: parseFloat(document.getElementById("payCash").value) || 0,
+      gcash: parseFloat(document.getElementById("payGCash").value) || 0,
+      bank: parseFloat(document.getElementById("payBank").value) || 0
+    },
+    service: document.getElementById("serviceSelect").value
+  };
+
+  let waitlist = JSON.parse(localStorage.getItem("waitlist")) || [];
+  waitlist.push(waitlistObj);
+  localStorage.setItem("waitlist", JSON.stringify(waitlist));
+
+  alert("Receipt added to waitlist!");
+  closeWaitlistModal();
+  // window.location.href = "waitlist.html"; // optional, leave commented if you want to stay
+});
+
+
+</script>
 </body>
 </html>
