@@ -66,10 +66,166 @@
 }
 
 
+/* SAVE MODAL */
+#saveModal {
+  display: none;
+  position: fixed; top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+#saveModalContent {
+  background: #06812b;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 350px;
+  text-align: center;
+}
+#saveModalContent select {
+  width: 90%;
+  padding: 5px;
+  margin: 5px 0;
+  font-size: 16px;
+}
+#saveModalContent button {
+  padding: 6px 12px;
+  margin: 5px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+}
+#saveYes { background: white; color: #06812b; }
+#saveCancel { background: #555; color: white; }
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.payment-row span {
+  font-size: 14px;
+}
+
+.payment-row input {
+  width: 90px;
+  padding: 4px;
+  font-size: 14px;
+}
+
+/* Horizontal scroll for waitlist table only */
+.waitlist-table-wrapper {
+  overflow-x: auto;    /* allows horizontal scroll */
+  overflow-y: hidden;  /* disables vertical scroll */
+  width: 100%;
+}
+
+.waitlist-table-wrapper table {
+  width: max-content; /* table can expand horizontally */
+  min-width: 100%;    /* optional: ensures it fills container if small */
+  border-collapse: collapse;
+}
+
+.waitlist-table-wrapper th, 
+.waitlist-table-wrapper td {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  text-align: left;
+  white-space: nowrap; /* prevent text from wrapping */
+}
+
+
+
 
 </style>
 </head>
-<body>
+<body  style="background-color: #e0e4cd;">
+<div class="waitlist-table-wrapper">
+  <table id="waitlistTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Date</th>
+        <th>Total</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+
+
+<!-- Save Modal -->
+<div id="saveModal">
+  <div id="saveModalContent">
+
+      <div style="margin-bottom:10px; font-size:16px; font-weight:bold; color: #e6ff07;">
+    Total to Pay: ₱<span id="totalDue">0.00</span>
+  </div>
+
+  <div style="margin-top:12px; padding:8px; background:#056622; border-radius:6px;">
+  <div style="font-size:14px;">
+    <strong>Cash Change Calculator</strong>
+  </div>
+
+  <div style="margin-top:6px;">
+    Cash Given: ₱
+    <input type="number" id="cashGiven" placeholder="0.00"
+           style="width:90px; padding:4px; font-size:14px;">
+  </div>
+
+  <div style="margin-top:6px; font-size:15px;">
+    Change: ₱<span id="changeAmount">0.00</span>
+  </div>
+</div><br>
+
+    <label>Payment Breakdown:</label>
+
+    <div class="payment-row">
+      <span>Cash</span>
+      <input type="number" id="payCash" placeholder="0.00">
+    </div>
+
+    <div class="payment-row">
+      <span>GCash</span>
+      <input type="number" id="payGCash" placeholder="0.00">
+    </div>
+
+    <div class="payment-row">
+      <span>Bank</span>
+      <input type="number" id="payBank" placeholder="0.00">
+    </div>
+
+    <label style="margin-top:10px;">Service Type:</label>
+    <select id="serviceSelect">
+      <option value="Dine-in">Dine-in</option>
+      <option value="Take-out">Take-out</option>
+      <option value="Pickup">Pickup</option>
+      <option value="Delivery">Delivery</option>
+    </select>
+
+    <div style="margin-top:10px;">
+      <strong>Total Paid: ₱<span id="paidTotal">0.00</span></strong>
+    </div>
+
+    
+
+
+    <button id="saveYes">Save</button>
+    <button id="saveCancel">Cancel</button>
+  </div>
+</div>
+
+
+
+<br>
 <img src="baigsLogo.png" alt="Baig's Logo" class="logo">
 <h1>Baig's POS</h1>
 
@@ -80,19 +236,20 @@
 
 <div class="cart">
   <h2>Cart</h2>
-  <table id="cartTable">
-    <thead>
-      <tr>
-        <th>Item</th>
-        <th>QTY</th>
-        <th>Price</th>
-        <th>Up</th> <!-- new column -->
-        <th>Action</th>
+  <div style="overflow-x:auto; background: #d7eb80;">
+    <table id="cartTable">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>QTY</th>
+          <th>Price</th>
+          <th>Upgrade</th>
+          <th>Action</th>
         </tr>
-
-    </thead>
-    <tbody></tbody>
-  </table>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
    <br>
   <!-- Discount input -->
   <div style="margin-top: 10px;">
@@ -103,8 +260,23 @@
   <h4>Subtotal: ₱<span id="subtotal">0</span></h4>
   <h4>Discount: ₱<span id="discountAmount">0</span></h4>
   <h3>Total: ₱<span id="total">0</span></h3>
-  <button id="goReceiptBtn">Go to Receipt</button>
 </div>
+
+<div style="text-align: center; margin: 20px 0;">
+ 
+  <button id="goReceiptBtn" 
+          style="padding: 10px 20px; font-size: 16px; cursor: pointer; background: #796d04; color: #fff; border: none; border-radius: 5px;">
+    Go to Receipt
+  </button>
+</div>
+
+<div style=" text-align: center; margin: 20px 0;">
+  <button onclick="goToHistory()" 
+          style="padding: 10px 20px; font-size: 16px; cursor: pointer; background: #0c4b04; color: #fff; border: none; border-radius: 5px;">
+    📜 View History
+  </button>
+</div>
+
 
 <!-- Upgrade Modal -->
 <div id="upgradeModal" style="
@@ -162,7 +334,6 @@ const cartTableBody = document.querySelector('#cartTable tbody');
 const subtotalSpan = document.getElementById('subtotal');
 const discountSpan = document.getElementById('discountAmount');
 const totalSpan = document.getElementById('total');
-
 function renderCategories() {
   menuDiv.innerHTML = '';
   const title = document.createElement('h3');
@@ -183,11 +354,12 @@ function renderVariants(category) {
   title.textContent = `Category: ${category}`;
   menuDiv.appendChild(title);
 
-  const backBtn = document.createElement('button');
-  backBtn.className = 'backBtn';
-  backBtn.textContent = '⬅ Back';
-  backBtn.onclick = () => renderCategories();
-  menuDiv.appendChild(backBtn);
+  // Back to main categories
+  const mainBackBtn = document.createElement('button');
+  mainBackBtn.className = 'backBtn';
+  mainBackBtn.textContent = '⬅ Back to Categories';
+  mainBackBtn.onclick = () => renderCategories();
+  menuDiv.appendChild(mainBackBtn);
 
   const variants = menu[category];
   Object.keys(variants).forEach(variant => {
@@ -204,6 +376,16 @@ function renderSizes(category, variant) {
   title.textContent = `Category: ${category} | Variant: ${variant}`;
   menuDiv.appendChild(title);
 
+
+
+  // Direct back to main categories
+  const mainBackBtn = document.createElement('button');
+  mainBackBtn.className = 'backBtn';
+  mainBackBtn.textContent = '⬅ Back to Categories';
+  mainBackBtn.onclick = () => renderCategories();
+  menuDiv.appendChild(mainBackBtn);
+
+    // Back to previous variant menu
   const backBtn = document.createElement('button');
   backBtn.className = 'backBtn';
   backBtn.textContent = '⬅ Back';
@@ -222,6 +404,7 @@ function renderSizes(category, variant) {
     menuDiv.appendChild(btn);
   });
 }
+
 
 let currentUpgradeIndex = null; // track which cart item is being edited
 
@@ -361,6 +544,143 @@ document.getElementById('goReceiptBtn').addEventListener('click', () => {
 
 // Initial menu render
 renderCategories();
+
+
+
+let waitlist = JSON.parse(localStorage.getItem("waitlist")) || [];
+const table = document.getElementById("waitlistTable");
+
+function renderWaitlist() {
+  table.innerHTML = "";
+  if(waitlist.length === 0) {
+    table.innerHTML = '<tr><td colspan="4">No waitlisted receipts</td></tr>';
+    return;
+  }
+
+waitlist.forEach((r, index) => {
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${r.id}</td>
+    <td>${r.customerName || "-"}</td>
+    <td>${r.date}</td>
+    <td>₱${r.total.toFixed(2)}</td>
+    <td>
+      <button class="save-btn" onclick="openSaveModal(${index})">💾 Save</button>
+      <button class="delete-btn" onclick="deleteFromWaitlist(${index})">❌ Delete</button>
+    </td>
+  `;
+  table.appendChild(row);
+});
+
+}
+
+function deleteFromWaitlist(index) {
+  if(confirm("Delete this waitlisted receipt?")) {
+    waitlist.splice(index, 1);
+    localStorage.setItem("waitlist", JSON.stringify(waitlist));
+    renderWaitlist();
+  }
+}
+
+renderWaitlist();
+
+// --- SAVE MODAL LOGIC ---
+let currentWaitlistIndex = null;
+
+const cashGivenInput = document.getElementById("cashGiven");
+const changeAmountSpan = document.getElementById("changeAmount");
+const totalDueSpan = document.getElementById("totalDue");
+
+function updateChange() {
+  const totalDue = parseFloat(totalDueSpan.textContent) || 0;
+  const cashGiven = parseFloat(cashGivenInput.value) || 0;
+  let change = cashGiven - totalDue;
+  if (change < 0) change = 0;
+  changeAmountSpan.textContent = change.toFixed(2);
+  changeAmountSpan.style.color = cashGiven >= totalDue ? "lime" : "red";
+}
+
+cashGivenInput.addEventListener("input", updateChange);
+
+function openSaveModal(index) {
+  currentWaitlistIndex = index;
+  const r = waitlist[index];
+
+  totalDueSpan.textContent = r.total.toFixed(2);
+
+  document.getElementById("payCash").value = r.payment?.cash || 0;
+  document.getElementById("payGCash").value = r.payment?.gcash || 0;
+  document.getElementById("payBank").value = r.payment?.bank || 0;
+  document.getElementById("serviceSelect").value = r.service || "Dine-in";
+
+  document.getElementById("paidTotal").textContent = getPaymentTotal().toFixed(2);
+
+  cashGivenInput.value = "";
+  changeAmountSpan.textContent = "0.00";
+
+  document.getElementById("saveModal").style.display = "flex";
+}
+
+function closeSaveModal() {
+  document.getElementById("saveModal").style.display = "none";
+}
+
+function getPaymentTotal() {
+  const cash = parseFloat(document.getElementById("payCash").value) || 0;
+  const gcash = parseFloat(document.getElementById("payGCash").value) || 0;
+  const bank = parseFloat(document.getElementById("payBank").value) || 0;
+  return cash + gcash + bank;
+}
+
+// Update total paid live
+["payCash","payGCash","payBank"].forEach(id => {
+  document.getElementById(id).addEventListener("input", () => {
+    document.getElementById("paidTotal").textContent =
+      getPaymentTotal().toFixed(2);
+  });
+});
+
+// Save waitlisted receipt to history
+document.getElementById("saveYes").addEventListener("click", () => {
+  if(currentWaitlistIndex === null) return;
+  const r = waitlist[currentWaitlistIndex];
+  const paidTotal = getPaymentTotal();
+
+  if(paidTotal !== r.total) {
+    alert("Payment amount must equal total ₱" + r.total.toFixed(2));
+    return;
+  }
+
+  // Update receipt info
+  r.payment = {
+    cash: parseFloat(document.getElementById("payCash").value) || 0,
+    gcash: parseFloat(document.getElementById("payGCash").value) || 0,
+    bank: parseFloat(document.getElementById("payBank").value) || 0
+  };
+  r.service = document.getElementById("serviceSelect").value;
+
+  // Add to receipts history
+  let receipts = JSON.parse(localStorage.getItem("receipts")) || [];
+  receipts.push(r);
+  localStorage.setItem("receipts", JSON.stringify(receipts));
+
+  // Remove from waitlist
+  waitlist.splice(currentWaitlistIndex, 1);
+  localStorage.setItem("waitlist", JSON.stringify(waitlist));
+  currentWaitlistIndex = null;
+
+  renderWaitlist();
+  closeSaveModal();
+});
+document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
+
+
+</script>
+
+<script>
+  function goToHistory() {
+    window.location.href = "history.html";
+  }
 </script>
 </body>
 </html>
