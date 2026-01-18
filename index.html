@@ -284,17 +284,40 @@
   </button>
 </div>
 
-<!-- Print Order Modal -->
-<div id="printModal" style="opacity:0; position:absolute; left:0; top:0; width:58mm; font-family:monospace;">
-  <h2 style="text-align:center;">Order Slip</h2>
-  <div id="modalOrderNumber"></div>
-  <div id="modalOrderDate"></div>
-  <hr>
-  <div id="modalOrderItems"></div>
-  <hr>
-  <div class="item"><strong>Subtotal</strong> <span id="modalSubtotal"></span></div>
-  <div class="item"><strong>Discount</strong> <span id="modalDiscount"></span></div>
-  <div class="item"><strong>Total</strong> <span id="modalTotal"></span></div>
+<!-- Print Order Slip Modal -->
+<div id="orderSlipModal" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+">
+  <div style="
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    max-width: 90%;
+    font-family: monospace;
+  ">
+    <h2 style="text-align:center;">Order Slip</h2>
+    <div id="modalOrderNumber"></div>
+    <div id="modalOrderDate"></div>
+    <hr>
+    <div id="modalOrderItems" style="margin-bottom:10px;"></div>
+    <hr>
+    <div class="item"><strong>Subtotal:</strong> <span id="modalSubtotal"></span></div>
+    <div class="item"><strong>Discount:</strong> <span id="modalDiscount"></span></div>
+    <div class="item"><strong>Total:</strong> <span id="modalTotal"></span></div>
+
+    <div style="text-align:center; margin-top:15px;">
+      <button id="printModalBtn" style="padding:8px 15px; margin-right:10px; background:#04a1f5; color:white; border:none; border-radius:5px; cursor:pointer;">🖨 Print</button>
+      <button id="closeModalBtn" style="padding:8px 15px; background:#555; color:white; border:none; border-radius:5px; cursor:pointer;">Close</button>
+    </div>
+  </div>
 </div>
 
 
@@ -720,7 +743,7 @@ document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
 document.getElementById('printOrderSlipBtn').addEventListener('click', () => {
   if(cart.length === 0) { alert("Cart is empty!"); return; }
 
-  // Order number
+  // Increment order number
   let lastOrderNumber = parseInt(localStorage.getItem('lastOrderNumber')) || 12100;
   lastOrderNumber++;
   localStorage.setItem('lastOrderNumber', lastOrderNumber);
@@ -734,6 +757,9 @@ document.getElementById('printOrderSlipBtn').addEventListener('click', () => {
   cart.forEach(item => {
     const div = document.createElement('div');
     div.className = 'item';
+    div.style.display = 'flex';
+    div.style.justifyContent = 'space-between';
+    div.style.marginBottom = '4px';
     div.innerHTML = `<span>${item.name} x${item.qty}</span><span>₱${(item.price*item.qty).toFixed(2)}</span>`;
     itemsDiv.appendChild(div);
   });
@@ -743,8 +769,24 @@ document.getElementById('printOrderSlipBtn').addEventListener('click', () => {
   document.getElementById('modalDiscount').textContent = '₱' + document.getElementById('discountAmount').textContent;
   document.getElementById('modalTotal').textContent = '₱' + document.getElementById('total').textContent;
 
-  // Print
-  setTimeout(() => { window.print(); }, 100); // short delay ensures content renders
+  // Show modal
+  document.getElementById('orderSlipModal').style.display = 'flex';
+});
+
+// Close modal
+document.getElementById('closeModalBtn').addEventListener('click', () => {
+  document.getElementById('orderSlipModal').style.display = 'none';
+});
+
+// Print only the modal content
+document.getElementById('printModalBtn').addEventListener('click', () => {
+  const printContents = document.getElementById('orderSlipModal').innerHTML;
+  const originalContents = document.body.innerHTML;
+
+  document.body.innerHTML = printContents;
+  window.print();
+  document.body.innerHTML = originalContents;
+  window.location.reload(); // reload to restore event listeners
 });
 
 
@@ -765,6 +807,7 @@ document.getElementById('printOrderSlipBtn').addEventListener('click', () => {
 
 </body>
 </html>
+
 
 
 
