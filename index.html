@@ -683,6 +683,16 @@ document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
     window.location.href = "history.html";
   }
 </script>
+
+  <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then(() => console.log("Service Worker Registered"));
+  }
+</script>
+
 </body>
 </html>
+
 
