@@ -41,7 +41,20 @@ button {
 }
 
 /* PRINT STYLES */
-
+@media print {
+  body { background: #fff; }
+  .receipt {
+    width: 80mm;
+    max-width: 80mm;
+    padding: 6px;
+    font-size: 12px;
+    margin: 0;
+  }
+  h2 { font-size: 16px; }
+  p, table { font-size: 12px; }
+  .total { font-size: 14px; }
+  button { display: none; }
+}
 
 /* HEADER */
 .header { text-align: center; margin-bottom: 15px; }
@@ -170,15 +183,8 @@ button {
       <td class="right" id="total"></td>
     </tr>
   </table>
-  
-<button onclick="connectPrinter()" style="background:#333;color:#fff;">
-  🔵 Connect Printer
-</button>
 
-<button onclick="printBluetoothReceipt()" style="background:#0c4b04;color:#fff;">
-  🖨 Print Receipt
-</button>
-
+  <button onclick="window.print()" style=" background: #0c4b04; color: #f5f5f5;">Print Receipt</button><br>
 
   <div style="max-width: 400px; margin: 0 auto; text-align: center; padding: 4px 10px; background: #f8f8f8; border-radius: 8px;">
     <button onclick="openSaveModal()" style="padding: 8px 16px; font-size: 16px;">💾 Save Receipt</button>
@@ -433,89 +439,7 @@ waitlistSaveBtn.addEventListener("click", () => {
 });
 
 
-  let btDevice;
-let btServer;
-let btCharacteristic;
-
-  async function connectPrinter() {
-  try {
-    btDevice = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true,
-      optionalServices: [
-        '000018f0-0000-1000-8000-00805f9b34fb', // POS service
-        '49535343-fe7d-4ae5-8fa9-9fafd205e455'  // Goojprt / Xprinter
-      ]
-    });
-
-    btServer = await btDevice.gatt.connect();
-
-    const services = await btServer.getPrimaryServices();
-
-    for (const service of services) {
-      const chars = await service.getCharacteristics();
-
-      for (const char of chars) {
-        if (char.properties.write || char.properties.writeWithoutResponse) {
-          btCharacteristic = char;
-          alert("Goojprt printer connected ✅");
-          return;
-        }
-      }
-    }
-
-    alert("No writable channel found (printer not supported)");
-  } catch (err) {
-    alert("Bluetooth error: " + err.message);
-  }
-}
-
-  async function writeChunks(characteristic, data) {
-  const CHUNK_SIZE = 120; // Goojprt safe size
-  for (let i = 0; i < data.length; i += CHUNK_SIZE) {
-    const chunk = data.slice(i, i + CHUNK_SIZE);
-    await characteristic.writeValue(chunk);
-    await new Promise(r => setTimeout(r, 30));
-  }
-}
-
-
- async function printBluetoothReceipt() {
-  if (!btCharacteristic) {
-    alert("Connect printer first");
-    return;
-  }
-
-  const ESC = "\x1B";
-  const GS = "\x1D";
-
-  let receipt = "";
-  receipt += ESC + "@";
-  receipt += ESC + "a" + "\x01";
-  receipt += "BAIG'S RESTAURANT\n";
-  receipt += ESC + "a" + "\x00";
-  receipt += "------------------------------\n";
-
-  cart.forEach(item => {
-    const qty = item.qty || 1;
-    const lineTotal = item.price * qty;
-    receipt += `${item.name}\n`;
-    receipt += ` ${qty} x ${item.price.toFixed(2)}   ${lineTotal.toFixed(2)}\n`;
-  });
-
-  receipt += "------------------------------\n";
-  receipt += `TOTAL: ${total.toFixed(2)}\n\n`;
-  receipt += ESC + "a" + "\x01";
-  receipt += "Thank you!\n\n\n";
-  receipt += GS + "V" + "\x00";
-
-  const data = new TextEncoder().encode(receipt);
-  await writeChunks(btCharacteristic, data);
-}
-
-
-
 </script>
 </body>
 </html>
-
 
