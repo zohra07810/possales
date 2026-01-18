@@ -140,19 +140,19 @@
   white-space: nowrap; /* prevent text from wrapping */
 }
 
-  
 @media print {
   body * { visibility: hidden; } /* hide everything */
-  #orderSlipPrint, #orderSlipPrint * { visibility: visible; }
-  #orderSlipPrint { 
+  #orderSlip, #orderSlip * { visibility: visible; }
+  #orderSlip {
     position: absolute;
-    left: 0; top: 0;
+    left: 0;
+    top: 0;
     width: 58mm; /* thermal paper width */
     font-family: monospace;
     font-size: 16px;
+    line-height: 1.2;
   }
 }
-
 
 
 
@@ -279,14 +279,15 @@
 
 <div style="text-align: center; margin: 20px 0;">
 
- <div style="text-align: center; margin: 20px 0;">
+<div style="text-align: center; margin: 20px 0;">
   <button id="printOrderSlipBtn" 
           style="padding: 10px 20px; font-size: 16px; cursor: pointer; background: #04a1f5; color: #fff; border: none; border-radius: 5px;">
     🧾 Print Order Slip
   </button>
 </div>
 
-  <div id="orderSlipPrint" style="display:none;"></div>
+
+ <div id="orderSlip" style="display:none;"></div>
 
  
   <button id="goReceiptBtn" 
@@ -707,36 +708,40 @@ document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
     window.location.href = "history.html";
   }
 
- document.getElementById('printOrderSlipBtn').addEventListener('click', () => {
-  if(cart.length === 0) { alert("Cart is empty!"); return; }
+document.getElementById('printOrderSlipBtn').addEventListener('click', () => {
+  if(cart.length === 0) { 
+    alert("Cart is empty!"); 
+    return; 
+  }
 
-  const printDiv = document.getElementById('orderSlipPrint');
-  printDiv.innerHTML = '';
+  const slip = document.getElementById('orderSlip');
+  slip.innerHTML = ''; // clear previous slip
 
-  // Add header
-  printDiv.innerHTML += '<h2 style="text-align:center;">Order Slip</h2>';
-  printDiv.innerHTML += `<div>Date: ${new Date().toLocaleString()}</div>`;
-  printDiv.innerHTML += '<hr>';
+  // Header
+  slip.innerHTML += '<h2 style="text-align:center;">Order Slip</h2>';
+  slip.innerHTML += `<div>Date: ${new Date().toLocaleString()}</div>`;
+  slip.innerHTML += '<hr>';
 
-  // Add cart items
+  // Items
   cart.forEach(item => {
-    printDiv.innerHTML += `<div style="display:flex; justify-content:space-between;">
+    slip.innerHTML += `<div style="display:flex; justify-content:space-between;">
       <span>${item.name} x${item.qty}</span>
       <span>₱${(item.price*item.qty).toFixed(2)}</span>
     </div>`;
   });
 
-  // Add total
+  // Total
   const subtotal = cart.reduce((sum, item) => sum + item.price*item.qty, 0);
-  printDiv.innerHTML += '<hr>';
-  printDiv.innerHTML += `<div style="display:flex; justify-content:space-between;">
+  slip.innerHTML += '<hr>';
+  slip.innerHTML += `<div style="display:flex; justify-content:space-between;">
     <strong>Total</strong>
     <span>₱${subtotal.toFixed(2)}</span>
   </div>`;
 
-  // Trigger print
+  // Print directly
   window.print();
 });
+
 
 
 </script>
@@ -751,6 +756,7 @@ document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
 
 </body>
 </html>
+
 
 
 
