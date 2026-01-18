@@ -1,7 +1,6 @@
 const CACHE_NAME = "pos-cache-v1";
 const urlsToCache = [
-  "/",
-  "/index.html",
+  "index.html",
 ];
 
 self.addEventListener("install", event => {
