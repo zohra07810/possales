@@ -41,19 +41,55 @@ button {
 }
 
 /* PRINT STYLES */
+/* PRINT STYLES FOR 58MM PAPER */
 @media print {
-  body { background: #fff; }
-  .receipt {
-    width: 80mm;
-    max-width: 80mm;
-    padding: 6px;
-    font-size: 12px;
-    margin: 0;
+  body {
+    background: #fff;
   }
-  h2 { font-size: 16px; }
-  p, table { font-size: 12px; }
-  .total { font-size: 14px; }
-  button { display: none; }
+
+  .receipt {
+    width: 58mm;         /* 58mm thermal paper */
+    max-width: 58mm;
+    padding: 8px;        /* slightly bigger padding */
+    font-size: 14px;     /* slightly bigger text for readability */
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  h2 {
+    font-size: 18px;     /* bigger header */
+    margin: 4px 0;
+  }
+
+  p, table {
+    font-size: 14px;     /* bigger for readability */
+  }
+
+  .total {
+    font-size: 16px;     /* bigger total amount */
+  }
+
+  .line {
+    border-top: 1px dashed #000;
+    margin: 6px 0;
+  }
+
+  button {
+    display: none;       /* hide buttons when printing */
+  }
+
+  img.logo {
+    max-width: 60px;     /* adjust logo for 58mm */
+    margin-bottom: 6px;
+  }
+
+  table td {
+    padding: 4px 0;
+  }
+
+  .right {
+    text-align: right;
+  }
 }
 
 /* HEADER */
@@ -442,4 +478,5 @@ waitlistSaveBtn.addEventListener("click", () => {
 </script>
 </body>
 </html>
+
 
