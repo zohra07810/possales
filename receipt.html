@@ -441,31 +441,47 @@ let btCharacteristic;
   try {
     btDevice = await navigator.bluetooth.requestDevice({
       acceptAllDevices: true,
-      optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb']
+      optionalServices: [
+        '000018f0-0000-1000-8000-00805f9b34fb', // POS service
+        '49535343-fe7d-4ae5-8fa9-9fafd205e455'  // Goojprt / Xprinter
+      ]
     });
 
     btServer = await btDevice.gatt.connect();
-    const service = await btServer.getPrimaryService(
-      '0000ffe0-0000-1000-8000-00805f9b34fb'
-    );
 
-    btCharacteristic = await service.getCharacteristic(
-      '0000ffe1-0000-1000-8000-00805f9b34fb'
-    );
+    const services = await btServer.getPrimaryServices();
 
-    alert("Printer connected ✅");
-  } catch (e) {
-    alert("Bluetooth error: " + e.message);
+    for (const service of services) {
+      const chars = await service.getCharacteristics();
+
+      for (const char of chars) {
+        if (char.properties.write || char.properties.writeWithoutResponse) {
+          btCharacteristic = char;
+          alert("Goojprt printer connected ✅");
+          return;
+        }
+      }
+    }
+
+    alert("No writable channel found (printer not supported)");
+  } catch (err) {
+    alert("Bluetooth error: " + err.message);
   }
 }
 
-  function enc(txt) {
-  return new TextEncoder().encode(txt);
+  async function writeChunks(characteristic, data) {
+  const CHUNK_SIZE = 120; // Goojprt safe size
+  for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+    const chunk = data.slice(i, i + CHUNK_SIZE);
+    await characteristic.writeValue(chunk);
+    await new Promise(r => setTimeout(r, 30));
+  }
 }
 
-  async function printBluetoothReceipt() {
+
+ async function printBluetoothReceipt() {
   if (!btCharacteristic) {
-    alert("Please connect printer first");
+    alert("Connect printer first");
     return;
   }
 
@@ -473,45 +489,27 @@ let btCharacteristic;
   const GS = "\x1D";
 
   let receipt = "";
-
-  // Init
   receipt += ESC + "@";
-
-  // Center + bold store name
   receipt += ESC + "a" + "\x01";
-  receipt += ESC + "E" + "\x01";
   receipt += "BAIG'S RESTAURANT\n";
-  receipt += ESC + "E" + "\x00";
-
-  receipt += "0945-597-0707\n";
-  receipt += "Dasmariñas City\n\n";
-
-  // Left align
   receipt += ESC + "a" + "\x00";
   receipt += "------------------------------\n";
 
-  // ITEMS
   cart.forEach(item => {
     const qty = item.qty || 1;
     const lineTotal = item.price * qty;
-
     receipt += `${item.name}\n`;
-    receipt += `  ${qty} x ${item.price.toFixed(2)}   ${lineTotal.toFixed(2)}\n`;
+    receipt += ` ${qty} x ${item.price.toFixed(2)}   ${lineTotal.toFixed(2)}\n`;
   });
 
   receipt += "------------------------------\n";
-  receipt += `Subtotal:      ${subtotal.toFixed(2)}\n`;
-  receipt += `Discount:     -${discountAmount.toFixed(2)}\n`;
-  receipt += `TOTAL:         ${total.toFixed(2)}\n`;
-
-  receipt += "\n";
+  receipt += `TOTAL: ${total.toFixed(2)}\n\n`;
   receipt += ESC + "a" + "\x01";
   receipt += "Thank you!\n\n\n";
-
-  // Cut
   receipt += GS + "V" + "\x00";
 
-  await btCharacteristic.writeValue(enc(receipt));
+  const data = new TextEncoder().encode(receipt);
+  await writeChunks(btCharacteristic, data);
 }
 
 
@@ -519,4 +517,5 @@ let btCharacteristic;
 </script>
 </body>
 </html>
+
 
