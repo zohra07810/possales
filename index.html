@@ -264,6 +264,14 @@
 </div>
 
 <div style="text-align: center; margin: 20px 0;">
+
+  <div style="text-align: center; margin: 20px 0;">
+  <button id="printOrderSlipBtn" 
+          style="padding: 10px 20px; font-size: 16px; cursor: pointer; background: #04a1f5; color: #fff; border: none; border-radius: 5px;">
+    🧾 Print Order Slip
+  </button>
+</div>
+
  
   <button id="goReceiptBtn" 
           style="padding: 10px 20px; font-size: 16px; cursor: pointer; background: #796d04; color: #fff; border: none; border-radius: 5px;">
@@ -682,6 +690,41 @@ document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
   function goToHistory() {
     window.location.href = "history.html";
   }
+
+  document.getElementById('printOrderSlipBtn').addEventListener('click', () => {
+  if(cart.length === 0) { 
+    alert("Cart is empty!"); 
+    return; 
+  }
+
+  let printWindow = window.open('', '', 'width=300,height=600');
+  printWindow.document.write('<html><head><title>Order Slip</title>');
+  printWindow.document.write('<style>');
+  printWindow.document.write('body { font-family: monospace; font-size: 16px; margin: 0; padding: 10px; }');
+  printWindow.document.write('.item { display: flex; justify-content: space-between; margin-bottom: 4px; }');
+  printWindow.document.write('h2 { text-align: center; margin-bottom: 10px; font-size: 18px; }');
+  printWindow.document.write('</style></head><body>');
+  printWindow.document.write('<h2>Order Slip</h2>');
+  printWindow.document.write('<div>Date: ' + new Date().toLocaleString() + '</div>');
+  printWindow.document.write('<hr>');
+
+  cart.forEach(item => {
+    printWindow.document.write(
+      `<div class="item"><span>${item.name} x${item.qty}</span><span>₱${(item.price*item.qty).toFixed(2)}</span></div>`
+    );
+  });
+
+  let subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  printWindow.document.write('<hr>');
+  printWindow.document.write(`<div class="item"><strong>Subtotal</strong><span>₱${subtotal.toFixed(2)}</span></div>`);
+  printWindow.document.write('</body></html>');
+
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
+});
+
 </script>
 
   <script>
@@ -694,6 +737,7 @@ document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
 
 </body>
 </html>
+
 
 
 
