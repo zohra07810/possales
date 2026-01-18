@@ -566,7 +566,7 @@ waitlist.forEach((r, index) => {
     <td>${r.date}</td>
     <td>₱${r.total.toFixed(2)}</td>
     <td>
-      <button class="save-btn" onclick="openSaveModal(${index})">💾 Save</button>
+      <button class="save-btn" onclick="openSaveModal(${index})">To Pay</button>
       <button class="delete-btn" onclick="deleteFromWaitlist(${index})">❌ Delete</button>
     </td>
   `;
@@ -694,6 +694,7 @@ document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
 
 </body>
 </html>
+
 
 
 
