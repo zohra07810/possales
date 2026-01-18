@@ -141,19 +141,17 @@
 }
 
 @media print {
-  body * { visibility: hidden; } /* hide everything */
-  #orderSlip, #orderSlip * { visibility: visible; }
-  #orderSlip {
+  body * { visibility: hidden; }        /* hide everything */
+  #printModal, #printModal * { visibility: visible; } /* show modal */
+  #printModal {
     position: absolute;
     left: 0;
     top: 0;
-    width: 58mm; /* thermal paper width */
+    width: 58mm;                      
     font-family: monospace;
     font-size: 16px;
-    line-height: 1.2;
   }
 }
-
 
 
 
@@ -286,6 +284,18 @@
   </button>
 </div>
 
+<!-- Print Order Modal -->
+<div id="printModal" style="opacity:0; position:absolute; left:0; top:0; width:58mm; font-family:monospace;">
+  <h2 style="text-align:center;">Order Slip</h2>
+  <div id="modalOrderNumber"></div>
+  <div id="modalOrderDate"></div>
+  <hr>
+  <div id="modalOrderItems"></div>
+  <hr>
+  <div class="item"><strong>Subtotal</strong> <span id="modalSubtotal"></span></div>
+  <div class="item"><strong>Discount</strong> <span id="modalDiscount"></span></div>
+  <div class="item"><strong>Total</strong> <span id="modalTotal"></span></div>
+</div>
 
 
  
@@ -708,38 +718,35 @@ document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
   }
 
 document.getElementById('printOrderSlipBtn').addEventListener('click', () => {
-  if(cart.length === 0) { 
-    alert("Cart is empty!"); 
-    return; 
-  }
+  if(cart.length === 0) { alert("Cart is empty!"); return; }
 
-  const slip = document.getElementById('orderSlip');
-  slip.innerHTML = ''; // clear previous slip
+  // Order number
+  let lastOrderNumber = parseInt(localStorage.getItem('lastOrderNumber')) || 12100;
+  lastOrderNumber++;
+  localStorage.setItem('lastOrderNumber', lastOrderNumber);
 
-  // Header
-  slip.innerHTML += '<h2 style="text-align:center;">Order Slip</h2>';
-  slip.innerHTML += `<div>Date: ${new Date().toLocaleString()}</div>`;
-  slip.innerHTML += '<hr>';
+  // Fill modal
+  document.getElementById('modalOrderNumber').textContent = 'Order #: ' + lastOrderNumber;
+  document.getElementById('modalOrderDate').textContent = 'Date: ' + new Date().toLocaleString();
 
-  // Items
+  const itemsDiv = document.getElementById('modalOrderItems');
+  itemsDiv.innerHTML = '';
   cart.forEach(item => {
-    slip.innerHTML += `<div style="display:flex; justify-content:space-between;">
-      <span>${item.name} x${item.qty}</span>
-      <span>₱${(item.price*item.qty).toFixed(2)}</span>
-    </div>`;
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.innerHTML = `<span>${item.name} x${item.qty}</span><span>₱${(item.price*item.qty).toFixed(2)}</span>`;
+    itemsDiv.appendChild(div);
   });
 
-  // Total
-  const subtotal = cart.reduce((sum, item) => sum + item.price*item.qty, 0);
-  slip.innerHTML += '<hr>';
-  slip.innerHTML += `<div style="display:flex; justify-content:space-between;">
-    <strong>Total</strong>
-    <span>₱${subtotal.toFixed(2)}</span>
-  </div>`;
+  // Totals
+  document.getElementById('modalSubtotal').textContent = '₱' + document.getElementById('subtotal').textContent;
+  document.getElementById('modalDiscount').textContent = '₱' + document.getElementById('discountAmount').textContent;
+  document.getElementById('modalTotal').textContent = '₱' + document.getElementById('total').textContent;
 
-  // Print directly
-  window.print();
+  // Print
+  setTimeout(() => { window.print(); }, 100); // short delay ensures content renders
 });
+
 
 
 
@@ -754,10 +761,11 @@ document.getElementById('printOrderSlipBtn').addEventListener('click', () => {
   }
 </script>
 
-   <div id="orderSlip" style="position: absolute; left: -9999px; top: 0; width: 58mm; font-family: monospace;"></div>
+  
 
 </body>
 </html>
+
 
 
 
