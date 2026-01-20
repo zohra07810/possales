@@ -41,55 +41,19 @@ button {
 }
 
 /* PRINT STYLES */
-/* PRINT STYLES FOR 58MM PAPER */
 @media print {
-  body {
-    background: #fff;
-  }
-
+  body { background: #fff; }
   .receipt {
-    width: 58mm;         /* 58mm thermal paper */
-    max-width: 58mm;
-    padding: 8px;        /* slightly bigger padding */
-    font-size: 14px;     /* slightly bigger text for readability */
+    width: 80mm;
+    max-width: 80mm;
+    padding: 6px;
+    font-size: 12px;
     margin: 0;
-    box-sizing: border-box;
   }
-
-  h2 {
-    font-size: 18px;     /* bigger header */
-    margin: 4px 0;
-  }
-
-  p, table {
-    font-size: 14px;     /* bigger for readability */
-  }
-
-  .total {
-    font-size: 16px;     /* bigger total amount */
-  }
-
-  .line {
-    border-top: 1px dashed #000;
-    margin: 6px 0;
-  }
-
-  button {
-    display: none;       /* hide buttons when printing */
-  }
-
-  img.logo {
-    max-width: 60px;     /* adjust logo for 58mm */
-    margin-bottom: 6px;
-  }
-
-  table td {
-    padding: 4px 0;
-  }
-
-  .right {
-    text-align: right;
-  }
+  h2 { font-size: 16px; }
+  p, table { font-size: 12px; }
+  .total { font-size: 14px; }
+  button { display: none; }
 }
 
 /* HEADER */
@@ -214,6 +178,11 @@ button {
       <td>Discount</td>
       <td class="right" id="discountText"></td>
     </tr>
+    <tr id="deliveryRow" style="display:none;">
+  <td>Delivery Fee</td>
+  <td class="right" id="deliveryText"></td>
+  </tr>
+
     <tr class="total">
       <td>Total</td>
       <td class="right" id="total"></td>
@@ -223,7 +192,7 @@ button {
   <button onclick="window.print()" style=" background: #0c4b04; color: #f5f5f5;">Print Receipt</button><br>
 
   <div style="max-width: 400px; margin: 0 auto; text-align: center; padding: 4px 10px; background: #f8f8f8; border-radius: 8px;">
-    <button onclick="openSaveModal()" style="padding: 8px 16px; font-size: 16px;">To Pay</button>
+    <button onclick="openSaveModal()" style="padding: 8px 16px; font-size: 16px;">💾 To Pay</button>
   </div><br>
 
   <div style="max-width: 400px; margin: 0 auto; text-align: center; padding: 4px 10px; background: #f8f8f8; border-radius: 8px;">
@@ -277,13 +246,6 @@ button {
       <input type="number" id="payBank" placeholder="0.00">
     </div>
 
-    <label style="margin-top:10px;">Service Type:</label>
-    <select id="serviceSelect">
-      <option value="Dine-in">Dine-in</option>
-      <option value="Take-out">Take-out</option>
-      <option value="Pickup">Pickup</option>
-      <option value="Delivery">Delivery</option>
-    </select>
 
     <div style="margin-top:10px;">
       <strong>Total Paid: ₱<span id="paidTotal">0.00</span></strong>
@@ -314,36 +276,75 @@ button {
 
 
 <script>
-// Load cart & render
+// =======================
+// LOAD CART & CALCULATIONS
+// =======================
 const cart = JSON.parse(localStorage.getItem("cart")) || [];
 const discountAmount = parseFloat(localStorage.getItem("discount")) || 0;
+const deliveryFee = parseFloat(localStorage.getItem("deliveryFee")) || 0;
+const service = localStorage.getItem("service") || "Dine-in";
+
 const itemsTable = document.getElementById("items");
 let subtotal = 0;
 
+// Render items
 cart.forEach(item => {
-  const itemTotal = item.price * (item.qty || 1);
+  const qty = item.qty || 1;
+  const itemTotal = item.price * qty;
+
   const row = document.createElement("tr");
-  row.innerHTML = `<td>${item.name} x${item.qty || 1}</td>
-                   <td class="right">₱${itemTotal.toFixed(2)}</td>`;
+  row.innerHTML = `
+    <td>${item.name} x${qty}</td>
+    <td class="right">₱${itemTotal.toFixed(2)}</td>
+  `;
   itemsTable.appendChild(row);
+
   subtotal += itemTotal;
 });
 
-const total = Math.max(0, subtotal - discountAmount);
+// Base total
+let finalTotal = Math.max(0, subtotal - discountAmount);
+
+// Add delivery fee ONLY if Delivery
+if (service === "Delivery" && deliveryFee > 0) {
+  finalTotal += deliveryFee;
+
+  // show delivery row
+  const deliveryRow = document.getElementById("deliveryRow");
+  if (deliveryRow) {
+    deliveryRow.style.display = "table-row";
+    document.getElementById("deliveryText").textContent = "₱" + deliveryFee.toFixed(2);
+  }
+} else {
+  // hide delivery row for other services
+  const deliveryRow = document.getElementById("deliveryRow");
+  if (deliveryRow) deliveryRow.style.display = "none";
+}
+
+// Display totals
 document.getElementById("subtotal").textContent = "₱" + subtotal.toFixed(2);
 document.getElementById("discountText").textContent = "-₱" + discountAmount.toFixed(2);
-document.getElementById("total").textContent = "₱" + total.toFixed(2);
+document.getElementById("total").textContent = "₱" + finalTotal.toFixed(2);
 
-// Go back to POS
+// Show service type on receipt
+const serviceRow = document.createElement("tr");
+serviceRow.innerHTML = `<td>Service Type: </td><td class="right">${service}</td>`;
+itemsTable.parentNode.insertBefore(serviceRow, itemsTable.nextSibling.nextSibling); // insert after items table
+
+// =======================
+// NAVIGATION
+// =======================
 function goBack() {
   window.location.href = "index.html";
 }
 
+// =======================
+// CASH CHANGE CALCULATOR
+// =======================
 const cashGivenInput = document.getElementById("cashGiven");
 const changeAmountSpan = document.getElementById("changeAmount");
 const totalDueSpan = document.getElementById("totalDue");
 
-// Update change based on cash given vs total to pay
 function updateChange() {
   const totalDue = parseFloat(totalDueSpan.textContent) || 0;
   const cashGiven = parseFloat(cashGivenInput.value) || 0;
@@ -352,24 +353,25 @@ function updateChange() {
   if (change < 0) change = 0;
 
   changeAmountSpan.textContent = change.toFixed(2);
-
-  // Optional: color red if underpaid, green if enough
   changeAmountSpan.style.color = cashGiven >= totalDue ? "lime" : "red";
 }
 
-// Event listener
 cashGivenInput.addEventListener("input", updateChange);
 
-// --- Save modal ---
-
+// =======================
+// SAVE MODAL
+// =======================
 function openSaveModal() {
-  totalDueSpan.textContent = total.toFixed(2);
+  totalDueSpan.textContent = finalTotal.toFixed(2);
+
   document.getElementById("payCash").value = "";
   document.getElementById("payGCash").value = "";
   document.getElementById("payBank").value = "";
   document.getElementById("paidTotal").textContent = "0.00";
+
   cashGivenInput.value = "";
   changeAmountSpan.textContent = "0.00";
+
   document.getElementById("saveModal").style.display = "flex";
 }
 
@@ -384,12 +386,47 @@ function getPaymentTotal() {
   return cash + gcash + bank;
 }
 
-// Live update total paid
+// Live update paid total
 ["payCash","payGCash","payBank"].forEach(id => {
   document.getElementById(id).addEventListener("input", () => {
     document.getElementById("paidTotal").textContent =
       getPaymentTotal().toFixed(2);
   });
+});
+
+// =======================
+// SAVE RECEIPT
+// =======================
+document.getElementById("saveYes").addEventListener("click", () => {
+  const paidTotal = getPaymentTotal();
+
+  if (paidTotal !== finalTotal) {
+    alert("Payment amount must equal total ₱" + finalTotal.toFixed(2));
+    return;
+  }
+
+  const receiptObj = {
+    id: Date.now(),
+    date: new Date().toLocaleString(),
+    items: cart,
+    subtotal,
+    discount: discountAmount,
+    deliveryFee: service === "Delivery" ? deliveryFee : 0,
+    total: finalTotal,
+    payment: {
+      cash: parseFloat(document.getElementById("payCash").value) || 0,
+      gcash: parseFloat(document.getElementById("payGCash").value) || 0,
+      bank: parseFloat(document.getElementById("payBank").value) || 0
+    },
+    service
+  };
+
+  let receipts = JSON.parse(localStorage.getItem("receipts")) || [];
+  receipts.push(receiptObj);
+  localStorage.setItem("receipts", JSON.stringify(receipts));
+
+  closeSaveModal();
+  window.location.href = "history.html";
 });
 
 // Save receipt
@@ -425,7 +462,12 @@ document.getElementById("saveYes").addEventListener("click", () => {
 
 document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
 
-// --- Waitlist Modal ---
+
+
+
+// =======================
+// WAITLIST
+// =======================
 const waitlistModal = document.getElementById("waitlistModal");
 const waitlistNameInput = document.getElementById("waitlistName");
 const waitlistSaveBtn = document.getElementById("waitlistSave");
@@ -456,13 +498,14 @@ waitlistSaveBtn.addEventListener("click", () => {
     items: cart,
     subtotal,
     discount: discountAmount,
-    total,
+    deliveryFee: service === "Delivery" ? deliveryFee : 0,
+    total: finalTotal,
     payment: {
       cash: parseFloat(document.getElementById("payCash").value) || 0,
       gcash: parseFloat(document.getElementById("payGCash").value) || 0,
       bank: parseFloat(document.getElementById("payBank").value) || 0
     },
-    service: document.getElementById("serviceSelect").value
+    service
   };
 
   let waitlist = JSON.parse(localStorage.getItem("waitlist")) || [];
@@ -471,13 +514,12 @@ waitlistSaveBtn.addEventListener("click", () => {
 
   alert("Receipt added to waitlist!");
   closeWaitlistModal();
-  // window.location.href = "waitlist.html"; // optional, leave commented if you want to stay
 });
-
-
 </script>
+
+
+
+
+
 </body>
 </html>
-
-
-
