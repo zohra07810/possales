@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<link rel="manifest" href="manifest.json">
 <title>POS – Main Page</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
@@ -142,7 +141,7 @@
 
 /* Category buttons */
 .category-btn {
-  background: #2c3e50;
+  background: #0b5329;
   color: #fff;
   padding: 12px;
   margin: 6px;
@@ -153,7 +152,7 @@
 
 /* Variant buttons */
 .variant-btn {
-  background: #27ae60; /* green */
+  background: #2c3e50; /* green */
   color: #fff;
   padding: 12px;
   margin: 6px;
@@ -170,8 +169,8 @@
   margin: 6px;
   border: none;
   border-radius: 6px;
-  font-size: 17px;
-  font-weight: bold;
+  font-size: 14px;
+
 }
 
 /* Back buttons */
@@ -194,6 +193,14 @@ button:active {
 </style>
 </head>
 <body  style="background-color: #e0e4cd;">
+  <script>
+// Check if admin is logged in
+if (localStorage.getItem("adminLoggedIn") !== "true") {
+  // Redirect to login page if not logged in
+  window.location.href = "login.html";
+}
+</script>
+
 <div class="waitlist-table-wrapper">
   <table id="waitlistTable">
     <thead>
@@ -252,14 +259,7 @@ button:active {
       <input type="number" id="payBank" placeholder="0.00">
     </div>
 
-    <label style="margin-top:10px;">Service Type:</label>
-    <select id="serviceSelect">
-      <option value="Dine-in">Dine-in</option>
-      <option value="Take-out">Take-out</option>
-      <option value="Pickup">Pickup</option>
-      <option value="Delivery">Delivery</option>
-    </select>
-
+  
     <div style="margin-top:10px;">
       <strong>Total Paid: ₱<span id="paidTotal">0.00</span></strong>
     </div>
@@ -283,10 +283,10 @@ button:active {
   <div id="menuItems"></div>
 </div>
 
-<div class="cart">
+<div class="cart" >
   <h2>Cart</h2>
   <div style="overflow-x:auto; background: #d7eb80;">
-    <table id="cartTable">
+    <table id="cartTable" >
       <thead>
         <tr>
           <th>Item</th>
@@ -306,9 +306,32 @@ button:active {
     <input type="number" id="discount" value="0" min="0" style="width: 60px;">
   </div>
 
-  <h4>Subtotal: ₱<span id="subtotal">0</span></h4>
-  <h4>Discount: ₱<span id="discountAmount">0</span></h4>
-  <h3>Total: ₱<span id="total">0</span></h3>
+<!-- SERVICE TYPE -->
+<div style="margin-top:10px;">
+  <label>Service Type:</label>
+  <select id="serviceSelect">
+    <option value="Dine-in">Dine-in</option>
+    <option value="Take-out">Take-out</option>
+    <option value="Pickup">Pickup</option>
+    <option value="Delivery">Delivery</option>
+  </select>
+</div>
+
+<!-- DELIVERY FEE (HIDDEN BY DEFAULT) -->
+<div id="deliveryFeeRow" style="display:none; margin-top:10px;">
+  <label>Delivery Fee:</label>
+  <input type="number" id="deliveryFeeInput" value="0" min="0">
+</div>
+<br>
+<!-- TOTALS -->
+<p>Subtotal: ₱<span id="subtotal">0.00</span></p>
+<p>Discount: -₱<span id="discountAmount">0.00</span></p>
+<p>Delivery Fee: ₱<span id="deliveryDisplay">0.00</span></p>
+<h3>Total: ₱<span id="total">0.00</span></h3>
+
+
+
+
 </div>
 
 <div style="text-align: center; margin: 20px 0;">
@@ -326,6 +349,9 @@ button:active {
   </button>
 </div>
 
+<button onclick="logout()" style="padding:8px 16px; font-size:16px; margin: 10px;">
+  Logout
+</button>
 
 <!-- Upgrade Modal -->
 <div id="upgradeModal" style="
@@ -377,12 +403,45 @@ const menu = {
   }
 };
 
+
 let cart = [];
+let discountAmount = parseFloat(localStorage.getItem("discount")) || 0;
+let deliveryFee = 0;
+
+// DOM elements
 const menuDiv = document.getElementById('menuItems');
 const cartTableBody = document.querySelector('#cartTable tbody');
 const subtotalSpan = document.getElementById('subtotal');
 const discountSpan = document.getElementById('discountAmount');
 const totalSpan = document.getElementById('total');
+const deliveryDisplay = document.getElementById('deliveryDisplay');
+const serviceSelect = document.getElementById('serviceSelect');
+const deliveryFeeInput = document.getElementById('deliveryFeeInput');
+
+// Track selected service
+let selectedService = serviceSelect.value;
+serviceSelect.addEventListener("change", () => {
+  selectedService = serviceSelect.value;
+  const deliveryFeeRow = document.getElementById('deliveryFeeRow');
+  if(selectedService === "Delivery") {
+    deliveryFeeInput.parentElement.style.display = "block";
+  } else {
+    deliveryFeeInput.parentElement.style.display = "none";
+    deliveryFeeInput.value = 0;
+    deliveryFee = 0;
+  }
+  renderCart();
+});
+
+// Update delivery fee live
+deliveryFeeInput.addEventListener("input", () => {
+  deliveryFee = parseFloat(deliveryFeeInput.value) || 0;
+  renderCart();
+});
+
+// =======================
+// MENU RENDERING
+// =======================
 function renderCategories() {
   menuDiv.innerHTML = '';
   const title = document.createElement('h3');
@@ -391,6 +450,7 @@ function renderCategories() {
 
   Object.keys(menu).forEach(category => {
     const btn = document.createElement('button');
+    btn.className = 'category-btn';
     btn.textContent = category;
     btn.onclick = () => renderVariants(category);
     menuDiv.appendChild(btn);
@@ -403,16 +463,16 @@ function renderVariants(category) {
   title.textContent = `Category: ${category}`;
   menuDiv.appendChild(title);
 
-  // Back to main categories
-  const mainBackBtn = document.createElement('button');
-  mainBackBtn.className = 'backBtn';
-  mainBackBtn.textContent = '⬅ Back to Categories';
-  mainBackBtn.onclick = () => renderCategories();
-  menuDiv.appendChild(mainBackBtn);
+  const backBtn = document.createElement('button');
+  backBtn.className = 'backBtn';
+  backBtn.textContent = '⬅ Back to Categories';
+  backBtn.onclick = () => renderCategories();
+  menuDiv.appendChild(backBtn);
 
   const variants = menu[category];
   Object.keys(variants).forEach(variant => {
     const btn = document.createElement('button');
+    btn.className = 'variant-btn';
     btn.textContent = variant;
     btn.onclick = () => renderSizes(category, variant);
     menuDiv.appendChild(btn);
@@ -445,6 +505,7 @@ function renderSizes(category, variant) {
   Object.keys(sizes).forEach(size => {
     const price = sizes[size];
     const btn = document.createElement('button');
+    btn.className = 'size-btn';
     btn.textContent = `${variant} (${size}) - ₱${price}`;
     btn.onclick = () => {
       cart.push({ name: `${category} - ${variant} (${size})`, price, qty: 1 });
@@ -453,36 +514,32 @@ function renderSizes(category, variant) {
     menuDiv.appendChild(btn);
   });
 }
-
-
-let currentUpgradeIndex = null; // track which cart item is being edited
+// =======================
+// CART FUNCTIONS
+// =======================
+let currentUpgradeIndex = null;
 
 function openUpgradeModal(item, index) {
   currentUpgradeIndex = index;
-  const modal = document.getElementById('upgradeModal');
   document.getElementById('upgradeName').value = item.name;
   document.getElementById('upgradePrice').value = item.price;
-  modal.style.display = 'flex';
+  document.getElementById('upgradeModal').style.display = 'flex';
 }
 
 function closeUpgradeModal() {
   document.getElementById('upgradeModal').style.display = 'none';
 }
 
-// Save changes
 document.getElementById('saveUpgrade').addEventListener('click', () => {
-  if (currentUpgradeIndex !== null) {
+  if(currentUpgradeIndex !== null) {
     const newName = document.getElementById('upgradeName').value.trim();
     const newPrice = parseFloat(document.getElementById('upgradePrice').value) || 0;
-
     cart[currentUpgradeIndex].name = newName || cart[currentUpgradeIndex].name;
     cart[currentUpgradeIndex].price = newPrice;
     renderCart();
     closeUpgradeModal();
   }
 });
-
-
 
 function renderCart() {
   cartTableBody.innerHTML = '';
@@ -564,34 +621,31 @@ row.appendChild(upgradeCell);
 
     subtotal += itemTotal;
   });
+  discountAmount = parseFloat(document.getElementById('discount').value) * 0.2 || 0;
+  if(selectedService==="Delivery") deliveryFee = parseFloat(deliveryFeeInput.value)||0;
+  else deliveryFee=0;
 
-  // Apply 20% of discount input
-  const discountInput = document.getElementById('discount');
-  let discountValue = parseFloat(discountInput.value) || 0;
-  const discountAmount = discountValue * 0.2;
-  const total = Math.max(0, subtotal - discountAmount);
+  const total = Math.max(0, subtotal - discountAmount + deliveryFee);
 
   subtotalSpan.textContent = subtotal.toFixed(2);
   discountSpan.textContent = discountAmount.toFixed(2);
+  deliveryDisplay.textContent = deliveryFee.toFixed(2);
   totalSpan.textContent = total.toFixed(2);
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  localStorage.setItem("discount", discountAmount);
+  localStorage.setItem("deliveryFee", deliveryFee);
+  localStorage.setItem("service", selectedService);
 }
 
-// Re-render cart on discount change
 document.getElementById('discount').addEventListener('input', renderCart);
 
-// Go to receipt
 document.getElementById('goReceiptBtn').addEventListener('click', () => {
-  if(cart.length === 0) { alert("Cart is empty!"); return; }
-  localStorage.setItem('cart', JSON.stringify(cart));
-  
-  const discountValue = parseFloat(document.getElementById('discount').value) || 0;
-  const discountAmount = discountValue * 0.2;
-  localStorage.setItem('discount', discountAmount);
-
-  window.location.href = 'receipt.html';
+  if(cart.length===0){ alert("Cart is empty!"); return; }
+  window.location.href='receipt.html';
 });
 
-// Initial menu render
+// INITIALIZE MENU
 renderCategories();
 
 
@@ -614,7 +668,7 @@ waitlist.forEach((r, index) => {
     <td>${r.date}</td>
     <td>₱${r.total.toFixed(2)}</td>
     <td>
-      <button class="save-btn" onclick="openSaveModal(${index})">To Pay</button>
+      <button class="save-btn" onclick="openSaveModal(${index})">💾 Save</button>
       <button class="delete-btn" onclick="deleteFromWaitlist(${index})">❌ Delete</button>
     </td>
   `;
@@ -730,20 +784,15 @@ document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
   function goToHistory() {
     window.location.href = "history.html";
   }
-</script>
 
-  <script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker
-      .register("service-worker.js")
-      .then(() => console.log("Service Worker Registered"));
+  function logout() {
+  // Remove login flag
+  localStorage.removeItem("adminLoggedIn");
+  
+  // Redirect to login page
+  window.location.href = "login.html";
   }
-</script>
 
+</script>
 </body>
 </html>
-
-
-
-
-
