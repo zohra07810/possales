@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POS Admin Login</title>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: monospace;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.login-box {
+  background: #fff;
+  padding: 20px;
+  width: 280px;
+  box-sizing: border-box;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+h2 { font-size: 26px; margin: 10px 0; }
+#pinDisplay {
+  font-size: 24px;
+  letter-spacing: 8px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+.keypad button {
+  padding: 15px;
+  font-size: 18px;
+  border: none;
+  border-radius: 6px;
+  background: #222;
+  color: #fff;
+  cursor: pointer;
+}
+.keypad button:active { background: #444; }
+.clear { background: #b00020; }
+.enter { background: #00695c; }
+#error { color: red; margin-top:10px; }
+</style>
+</head>
+<body>
+
+<div class="login-box">
+    <!-- Logo Image -->
+  <img src="baigsLogo.png" alt="POS Logo" style="display:block; margin: 0 auto 15px; width:120px; height:auto;">
+  <h2>Enter PIN</h2>
+  <div id="pinDisplay">----</div>
+  
+  <div class="keypad">
+    <button onclick="addPin('1')">1</button>
+    <button onclick="addPin('2')">2</button>
+    <button onclick="addPin('3')">3</button>
+    <button onclick="addPin('4')">4</button>
+    <button onclick="addPin('5')">5</button>
+    <button onclick="addPin('6')">6</button>
+    <button onclick="addPin('7')">7</button>
+    <button onclick="addPin('8')">8</button>
+    <button onclick="addPin('9')">9</button>
+    <button class="clear" onclick="clearPin()">C</button>
+    <button onclick="addPin('0')">0</button>
+    <button class="enter" onclick="checkPin()">✔</button>
+  </div>
+
+  <p id="error"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabaseClient = supabase.createClient(
+  "https://ismicrntffubdldeqpkh.supabase.co",
+  "sb_publishable_ZAiS4CtJOP6FbV7pmlAGWw__dsvwHqG"
+);
+
+// --- PIN variable ---
+let enteredPin = "";
+
+// --- Update display ---
+function updateDisplay() {
+  document.getElementById("pinDisplay").innerText =
+    enteredPin.replace(/./g,"•") || "----";
+}
+
+// --- Add number ---
+function addPin(num) {
+  if(enteredPin.length < 6) {
+    enteredPin += num;
+    updateDisplay();
+  }
+}
+
+// --- Clear ---
+function clearPin() {
+  enteredPin = "";
+  updateDisplay();
+  document.getElementById("error").innerText = "";
+}
+
+async function checkPin() {
+  if(enteredPin === "") return;
+
+  const { data, error } = await supabaseClient
+    .from("adminlog")
+    .select("pin_hash")
+    .eq("id", 1)
+    .single();
+
+  if(error) {
+    document.getElementById("error").innerText = "DB Error";
+    console.error(error);
+    return;
+  }
+
+  // ✅ Use the correct column name here
+  if(enteredPin === data.pin_hash) {
+    localStorage.setItem("adminLoggedIn", "true");
+    window.location.href = "index.html"; // go to POS
+  } else {
+    document.getElementById("error").innerText = "Wrong PIN";
+    clearPin();
+  }
+}
+
+</script>
+
+
+</body>
+</html>
