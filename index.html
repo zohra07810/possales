@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#06812b">
+<link rel="icon" href="baigsLogo.png" type="image/png">
+
 <title>POS – Main Page</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
@@ -794,5 +798,16 @@ document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
   }
 
 </script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(reg => console.log('Service Worker registered.', reg))
+      .catch(err => console.error('Service Worker registration failed:', err));
+  });
+}
+</script>
+
 </body>
 </html>
