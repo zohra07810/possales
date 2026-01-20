@@ -334,6 +334,104 @@ h1, h2, h3 {
   }
 }
 
+  .cash-on-hand {
+    background-color: #b6b451; /* light gray background */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* subtle shadow */
+    max-width: 600px; /* center on large screens */
+    margin: 20px auto; /* center horizontally */
+    font-family: Arial, sans-serif;
+  }
+
+ /* Container for the form */
+  .manual-cash-form {
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Each row (IN/OUT) */
+  .manual-cash-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Label styling */
+  .manual-cash-row label {
+    min-width: 80px;
+    font-weight: bold;
+  }
+
+  /* Inputs styling with fixed width */
+  .manual-cash-row input[type="text"],
+  .manual-cash-row input[type="number"] {
+    width: 120px;       /* fixed width */
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  /* Button styling */
+  #updateCash {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+
+  #updateCash:hover {
+    background-color: #0056b3;
+  }
+
+  #updateCash {
+    display: block;       /* make it a block element */
+    width: auto;          /* keep natural width */
+    margin: 0 auto;       /* center horizontally */
+    padding: 8px 15px;
+    background-color: #283ba7;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  #updateCash:hover {
+    background-color: #218838;
+  }
+
+  /* Responsive for small screens */
+  @media (max-width: 500px) {
+    .manual-cash-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    /* Keep inputs small on mobile */
+    .manual-cash-row input[type="text"],
+    .manual-cash-row input[type="number"] {
+      width: 120px; /* fixed small width even on mobile */
+    }
+
+    input-group {
+      flex-direction: row; /* keep details + amount side by side */
+      gap: 5px;
+    }
+ 
+  }
+
+  
+
 /* =====================
    ANIMATION
 ===================== */
@@ -408,7 +506,51 @@ h1, h2, h3 {
   }
 }
 
+  /* Center and bold the current cash display */
+  #currentCashContainer {
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px; /* optional: make it slightly bigger */
+    margin: 15px 0;
+  }
 
+  #cashMovementsTable th,
+  #cashMovementsTable td {
+    border: 1px solid black; /* black borders */
+    padding: 8px;
+    text-align: center;
+  }
+
+  #cashMovementsTable th {
+    background-color: #cfd8e6; /* slightly darker header */
+  }
+
+   #currentCashContainer {
+    color: #283ba7;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    text-decoration: underline; /* this adds the underline */
+  }
+
+  .table-scroll-3 {
+  max-height: 200px;   /* ≈ 3 rows (adjust if needed) */
+  overflow-y: auto;
+  border-radius: 8px;
+}
+
+/* Keep header visible while scrolling */
+.table-scroll-3 thead th {
+  position: sticky;
+  top: 0;
+  background: #c9cfc8;
+  z-index: 2;
+}
+
+/* Mobile-friendly row height */
+#expensesReportSummaryBody tr {
+  height: 48px;
+}
 
 </style>
 
@@ -433,9 +575,10 @@ const supabaseClient = supabase.createClient(
 <!-- Floating dropdown menu -->
 <nav id="mobileMenu" class="mobile-menu">
   <button onclick="showSection('receipts')">Receipt History</button>
-  <button onclick="showSection('expenses')">Add Expenses</button>
-  <button onclick="showSection('reports')">Sales & Expenses Records</button>
-  <button onclick="showSection('archivedReceipts')">Archived Receipts</button>
+  <button onclick="showSection('expenses')">Add Expenses, FP & Grab</button>
+  <button onclick="showSection('cashonhand')">Cash on Hand</button>
+  <button onclick="showSection('reports')">Records</button>
+  
 
 </nav>
 
@@ -480,7 +623,7 @@ const supabaseClient = supabase.createClient(
 
 
   <div style="text-align:center; margin-top:15px;">
-    <button class="view-btn" onclick="openReportModal()">➕ Add All to Report</button>
+    <button class="view-btn" style="background: #72003f;" onclick="openReportModal()">➕ REPORT</button>
   </div>
 
   <div id="reportModal">
@@ -517,74 +660,63 @@ const supabaseClient = supabase.createClient(
 
 
 
-
-  
-<!-- Foodpanda & Grab Sales Input Card -->
-<div class="table-container" style="max-width:500px; margin:20px auto; padding:15px; background:#eb87f8;">
-  <h3 style="text-align:center; margin-bottom:15px;">🚀 Online Platform Sales</h3>
-
-  <!-- Input Form -->
-  <div style="display:flex; flex-direction:column; gap:10px; max-width:400px; margin:0 auto;">
-
-    <!-- Foodpanda -->
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <label for="foodpandaSales">Foodpanda Sales:</label>
-      <input type="number" id="foodpandaSales" placeholder="₱0.00" style="width:150px; padding:6px; border-radius:5px; border:1px solid #ccc;">
-    </div>
-
-     <!-- Calculated Total -->
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <span>Total After Foodpanda 30%:</span>
-      <span id="foodpandaTotal">₱0.00</span>
-    </div>
-
-    <!-- Grab -->
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <label for="grabSales">Grab Sales:</label>
-      <input type="number" id="grabSales" placeholder="₱0.00" style="width:150px; padding:6px; border-radius:5px; border:1px solid #ccc;">
-    </div>
-
-   
-
-    <div style="text-align:center; margin-top:10px;">
-      <button class="view-btn" onclick="addDeliverySales()">Add to Records</button>
-    </div>
-
-  </div>
 </div>
 
 
-</div>
+<!-- CASH ON HAND SECTION -->
+<div id="cashonhand" style="display:none;">
 
-<!-- ARCHIVED RECEIPTS -->
-<div id="archivedReceipts" style="display:none;">
-  <h2 style="text-align:center;">🗄️ Archived Receipts</h2>
-  <div class="table-container">
-    <table>
+  <div class="cash-on-hand">
+    <h2 style="text-align:center;">Cash on Hand</h2>
+
+    <div id="currentCashContainer" style="color:#152166;">
+      Current Cash: ₱<span id="currentCash">0.00</span>
+    </div>
+
+    <!-- Manual IN / OUT -->
+    <div class="manual-cash-form">
+      <div class="manual-cash-row">
+        <label for="manualInName">Manual IN:</label>
+        <input type="text" id="manualInName" placeholder="Details">
+        <input type="number" id="manualInAmount" placeholder="0.00">
+      </div>
+
+      <div class="manual-cash-row">
+        <label for="manualOutName">Manual OUT:</label>
+        <input type="text" id="manualOutName" placeholder="Details">
+        <input type="number" id="manualOutAmount" placeholder="0.00">
+      </div>
+
+      <button id="updateCash">Add Manual Entry</button>
+    </div>
+
+    <!-- Cash Movements -->
+    <h3 style="text-align:center; margin-top:20px;">Cash Movements</h3>
+    <table id="cashMovementsTable" style="background:#dde6f0;">
       <thead>
         <tr>
-          <th>ID</th>
           <th>Date</th>
-          <th>Total</th>
-          <th>Payment</th>
-          <th>Service</th>
-          <th>Reason</th>
+          <th>IN Details</th>
+          <th>IN Amount (₱)</th>
+          <th>OUT Details</th>
+          <th>OUT Amount (₱)</th>
         </tr>
       </thead>
-      <tbody id="archivedTable"></tbody>
+      <tbody></tbody>
     </table>
+
   </div>
 </div>
-
 
 
 
 <div id="reports" style="display:none; ">
-  <hr style="margin:30px 0;">
-  <h2 style="text-align:center;">📊 Sales Records</h2>
+ <div style=" background: #9dfd90;">
+  <hr style="margin:30px 0; background: #9dfd90;">
+  <h2 style="text-align:center; background: #9dfd90;">📊 Store Sales</h2>
 
   <!-- Filters -->
-  <div style="display:flex; justify-content:center; gap:10px; margin-bottom:15px; width:80%; margin-left:auto; margin-right:auto; flex-wrap:wrap;">
+  <div style="display:flex; justify-content:center; gap:10px; margin-bottom:15px; width:80%; margin-left:auto; margin-right:auto; flex-wrap:wrap; background: #9dfd90;">
   <select id="salesFilterYear" onchange="applySalesFilter()" style="width:45%; padding:6px; font-size:12px;">
     <!-- years options -->
   </select>
@@ -608,19 +740,20 @@ const supabaseClient = supabase.createClient(
 
 
   <!-- Summary Table -->
-  <div class="table-container" id="salesReportContainer" style="display:none;background: #93e2a0;">
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Total Amount</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="salesReportSummaryBody"></tbody>
-    </table>
-  </div>
+ <div class="table-scroll-3" id="salesReportContainer" style="display:none; background:#93e2a0;">
+  <table style="width:100%; border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Total Amount</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="salesReportSummaryBody"></tbody>
+  </table>
+</div>
 
+</div> 
   <!-- DELIVERY SALES (Foodpanda & Grab) Preview -->
 <div id="deliveryReports" style="display:none; margin-top:30px; background: #eb90fd;">
   <hr style="margin:30px 0;">
@@ -649,19 +782,22 @@ const supabaseClient = supabase.createClient(
     </select>
   </div>
 
-  <!-- Summary Table -->
-  <div class="table-container" id="deliveryReportContainer" style="display:none; background: #db69df;">
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Foodpanda Net</th>
-          <th>Grab Net</th>
-        </tr>
-      </thead>
-      <tbody id="deliveryReportSummaryBody"></tbody>
-    </table>
-  </div>
+ <!-- Summary Table -->
+<div class="table-container table-scroll-3"
+     id="deliveryReportContainer"
+     style="display:none; background: #db69df;">
+  <table style="width:100%; border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Foodpanda Net</th>
+        <th>Grab Net</th>
+      </tr>
+    </thead>
+    <tbody id="deliveryReportSummaryBody"></tbody>
+  </table>
+</div>
+
   </div>
   <!-- Expenses Report Summary -->
 <div class="table-container" id="expensesReportContainer"
@@ -695,18 +831,21 @@ const supabaseClient = supabase.createClient(
 
 
 
-  <table style="background-color: #c9cfc8; border-radius: 8px; overflow: hidden; width: 100%;">
-  <thead >
-    <tr>
-      <th>Date</th>
-      <th>Total Amount</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody id="expensesReportSummaryBody">
-    <!-- Filled dynamically -->
-  </tbody>
-</table>
+<div class="table-scroll-3">
+  <table style="background-color:#c9cfc8; border-radius:8px; width:100%; border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Total Amount</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="expensesReportSummaryBody">
+      <!-- Filled dynamically -->
+    </tbody>
+  </table>
+</div>
+
 </div>
 
 <div id="expensesViewModal" style="display:none;" class="modal">
@@ -730,6 +869,26 @@ const supabaseClient = supabase.createClient(
   </div>
 </div>
 
+<!-- ARCHIVED RECEIPTS (now inside Reports) -->
+  <div id="archivedReceipts" style="margin-top:30px; background: #e2e60b;" >
+    <h2 style="text-align:center;">🗄️ Archived Receipts</h2>
+
+    <div class="table-container "  style="background: #f2f3a6;">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Total</th>
+            <th>Payment</th>
+            <th>Service</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody id="archivedTable"></tbody>
+      </table>
+    </div>
+  </div>
 
 </div>
 
@@ -797,29 +956,64 @@ const supabaseClient = supabase.createClient(
   </div>
 
   <!-- Preview Table -->
-  <div class="table-container" style="max-width:600px; margin:20px auto;">
-    <table>
-      <thead>
-        <tr>
-          <th>Item</th>
-          <th>Price</th>
-          <th>Payment</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
+<div class="table-container table-scroll-3"
+     style="max-width:600px; margin:20px auto;">
+  <table style="width:100%; border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Price</th>
+        <th>Payment</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
 
-      <tbody id="expensesTableBody">
-        <!-- Dynamically filled by JS -->
-      </tbody>
-    </table>
-  </div>
+    <tbody id="expensesTableBody">
+      <!-- Dynamically filled by JS -->
+    </tbody>
+  </table>
+</div>
 
   <!-- Add to Report Button -->
   <div style="text-align:center; margin-top:10px;">
-    <button class="view-btn" onclick="addExpensesToReport()">➕ Add All Expenses to Report</button>
+    <button class="view-btn" style="background: #72003f;" onclick="addExpensesToReport()">➕ REPORT</button>
   </div>
 <br>
- 
+  
+<!-- Foodpanda & Grab Sales Input Card -->
+<div class="table-container" style="max-width:500px; margin:20px auto; padding:15px; background:#eb87f8;">
+  <h3 style="text-align:center; margin-bottom:15px;">🚀 Online Platform Sales</h3>
+
+  <!-- Input Form -->
+  <div style="display:flex; flex-direction:column; gap:10px; max-width:400px; margin:0 auto;">
+
+    <!-- Foodpanda -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <label for="foodpandaSales">Foodpanda Sales:</label>
+      <input type="number" id="foodpandaSales" placeholder="₱0.00" style="width:150px; padding:6px; border-radius:5px; border:1px solid #ccc;">
+    </div>
+
+     <!-- Calculated Total -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span>Total After Foodpanda 30%:</span>
+      <span id="foodpandaTotal">₱0.00</span>
+    </div>
+
+    <!-- Grab -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <label for="grabSales">Grab Sales:</label>
+      <input type="number" id="grabSales" placeholder="₱0.00" style="width:150px; padding:6px; border-radius:5px; border:1px solid #ccc;">
+    </div>
+
+   
+
+    <div style="text-align:center; margin-top:10px;">
+      <button class="view-btn" style="background: #72003f;" onclick="addDeliverySales()">➕ REPORT</button>
+    </div>
+
+  </div>
+</div>
+
 
 
 
@@ -1053,7 +1247,7 @@ function toggleMenu() {
 
 
 function showSection(sectionId) {
-  const sections = ["receipts", "reports", "expenses","archivedReceipts"];
+  const sections = ["receipts", "reports", "expenses", "cashonhand"];
 
   // Hide all sections
   sections.forEach(id => {
@@ -1246,14 +1440,15 @@ function renderSalesSummary(data) {
     .sort((a, b) => new Date(b) - new Date(a))
     .forEach(date => {
 
-      const total = grouped[date].reduce(
-        (sum, s) => sum + Number(s.total), 0
-      );
+      const subtotal = grouped[date].reduce(
+  (sum, s) => sum + Number(s.subtotal), 0
+);
+
 
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${formatDate(date)}</td>
-        <td><strong>₱${total.toFixed(2)}</strong></td>
+        <td><strong>₱${subtotal.toFixed(2)}</strong></td>
         <td>
           <button class="view-btn"
             onclick='openSalesModal(${JSON.stringify(grouped[date])})'>
@@ -1315,7 +1510,8 @@ function formatDate(dateStr) {
 loadSalesReport();
 
 // Local array to hold expenses before sending
-let expenses = [];
+let expenses = JSON.parse(localStorage.getItem("localExpenses")) || [];
+
 
 // ----------------------------
 // Render local expenses table
@@ -1368,25 +1564,19 @@ function addExpense() {
   }
 
   expenses.push({ item, price, payment });
+
+  saveExpensesLocally();   // ✅ persist
   renderExpenses();
 
-  // Clear input fields
   nameInput.value = "";
   priceInput.value = "";
   paymentInput.value = "";
 }
 
-// ----------------------------
-// Remove a local expense
-// ----------------------------
-function removeExpense(index) {
-  expenses.splice(index, 1);
-  renderExpenses();
+function saveExpensesLocally() {
+  localStorage.setItem("localExpenses", JSON.stringify(expenses));
 }
 
-// ----------------------------
-// Add all expenses to Supabase
-// ----------------------------
 async function addExpensesToReport() {
   if (expenses.length === 0) {
     alert("No expenses to add.");
@@ -1396,7 +1586,7 @@ async function addExpensesToReport() {
   const payload = expenses.map(exp => ({
     item: exp.item,
     price: exp.price,
-    payment: exp.payment
+    payment: { cash: exp.payment.toLowerCase() === "cash" ? exp.price : 0 }
   }));
 
   const { error } = await supabaseClient
@@ -1409,13 +1599,17 @@ async function addExpensesToReport() {
     return;
   }
 
+  // ✅ Clear ONLY after success
   expenses = [];
-  renderExpenses();
+  localStorage.removeItem("localExpenses");
 
-  await loadExpensesReport();
+  renderExpenses();
   alert("Expenses added successfully ✅");
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  renderExpenses();
+});
 // ==============================
 // LOAD EXPENSES REPORT
 // ==============================
@@ -1733,6 +1927,137 @@ function applyDeliveryFilter() {
 
 // Call after page loads
 loadDeliveryReport();
+
+
+
+
+//CashonHand
+
+const cashTableBody = document.querySelector('#cashMovementsTable tbody');
+const currentCashSpan = document.getElementById('currentCash');
+
+const manualInNameInput = document.getElementById('manualInName');
+const manualInAmountInput = document.getElementById('manualInAmount');
+const manualOutNameInput = document.getElementById('manualOutName');
+const manualOutAmountInput = document.getElementById('manualOutAmount');
+const updateCashBtn = document.getElementById('updateCash');
+
+let manualEntries = []; // store manual IN/OUT entries
+
+// ============================
+// Fetch Cash Sales (cash only)
+// ============================
+async function fetchCashSales() {
+  const receipts = JSON.parse(localStorage.getItem("receipts")) || [];
+
+  return receipts
+    .filter(r => r.payment && Number(r.payment.cash) > 0) // CASH ONLY
+    .map(r => ({
+      date: r.date || new Date().toISOString().split('T')[0],
+      details: `Store Sales`,
+      cash: Number(r.subtotal || r.payment.cash || 0) // use subtotal if available
+    }));
+}
+
+async function fetchCashExpenses() {
+  const today = new Date().toISOString().split('T')[0];
+
+  return expenses
+    .filter(e => e.payment.toLowerCase() === 'cash') // CASH ONLY
+    .map(e => ({
+      date: today,              // use today's date
+      details: e.item,          // item name
+      cash: Number(e.price) || 0
+    }))
+    .filter(e => e.cash > 0);
+}
+
+// ============================
+// Render Cash Movements Table
+// ============================
+async function renderCashOnHand() {
+  const sales = await fetchCashSales();
+  const expenses = await fetchCashExpenses();
+
+  // Combine all entries
+  let movements = [];
+
+  sales.forEach(s => movements.push({ date: s.date, inDetails: s.details, inAmount: s.cash, outDetails: '', outAmount: 0 }));
+  expenses.forEach(e => movements.push({ date: e.date, inDetails: '', inAmount: 0, outDetails: e.details, outAmount: e.cash }));
+  manualEntries.forEach(m => {
+    if (m.type === 'in') movements.push({ date: m.date, inDetails: m.details, inAmount: m.amount, outDetails: '', outAmount: 0 });
+    if (m.type === 'out') movements.push({ date: m.date, inDetails: '', inAmount: 0, outDetails: m.details, outAmount: m.amount });
+  });
+
+  // Sort by date ascending
+  movements.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // Clear table
+  cashTableBody.innerHTML = '';
+
+  // Render rows & calculate current cash
+  let currentCash = 0;
+  movements.forEach(m => {
+    currentCash += m.inAmount - m.outAmount;
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${m.date}</td>
+      <td>${m.inDetails}</td>
+      <td>₱${m.inAmount.toFixed(2)}</td>
+      <td>${m.outDetails}</td>
+      <td>₱${m.outAmount.toFixed(2)}</td>
+    `;
+    cashTableBody.appendChild(row);
+  });
+
+  currentCashSpan.textContent = currentCash.toFixed(2);
+}
+
+// ============================
+// Manual IN/OUT Button
+// ============================
+updateCashBtn.addEventListener('click', () => {
+  const inName = manualInNameInput.value.trim();
+  const inAmount = parseFloat(manualInAmountInput.value) || 0;
+  if (inName && inAmount > 0) {
+    manualEntries.push({ type: 'in', date: new Date().toISOString().split('T')[0], details: inName, amount: inAmount });
+    manualInNameInput.value = '';
+    manualInAmountInput.value = '';
+  }
+
+  const outName = manualOutNameInput.value.trim();
+  const outAmount = parseFloat(manualOutAmountInput.value) || 0;
+  if (outName && outAmount > 0) {
+    manualEntries.push({ type: 'out', date: new Date().toISOString().split('T')[0], details: outName, amount: outAmount });
+    manualOutNameInput.value = '';
+    manualOutAmountInput.value = '';
+  }
+
+  renderCashOnHand();
+});
+
+
+// Initial render
+renderCashOnHand();
+
+
+// ==============================
+// AUTO-REFRESH EXPENSES & CASH
+// ==============================
+async function autoRefreshAll() {
+  await loadExpensesReport();  // refresh expenses
+  await renderCashOnHand();  
+  await loadSalesReport(); 
+  await loadDeliveryReport(); // refresh cash on hand table
+}
+
+// refresh every 5 seconds
+setInterval(autoRefreshAll, 5000);
+
+// INITIAL LOAD
+autoRefreshAll();
+
 
 </script>
 
