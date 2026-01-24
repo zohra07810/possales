@@ -393,14 +393,42 @@ if (localStorage.getItem("adminLoggedIn") !== "true") {
 
 <script>
 const menu = {
-   "Biryani": {
-    "Chicken": { "Student": 125, "Budget": 240, "Solo": 365, "Regular": 490, "Medium": 615,"Large": 740,"Jumbo": 865, "Bilao 12": 1355, "Bilao 14": 1970, "Bilao 16": 2710, "Bilao 18": 3575},
-    "Beef": { "Student": 135, "Budget": 260, "Solo": 395, "Regular": 530, "Medium": 800,"Large": 800,"Jumbo": 935, "Bilao 12": 1,465, "Bilao 14": 2,130, "Bilao 16": 2,930, "Bilao 18": 3,865}
+  "Biryani": {
+    "Chicken": { "Student": 125, "Budget": 240, "Solo": 365, "Regular": 490, "Medium": 615,"Large": 740,  "Jumbo": 865, "Bilao 12": 1355, "Bilao 14": 1970, "Bilao 16": 2710, "Bilao 18": 3575},
+
+    "Beef": { "Student": 135, "Budget": 260, "Solo": 395, "Regular": 530, "Medium": 800,"Large": 800,"Jumbo": 935, "Bilao 12": 1465, "Bilao 14": 2130, "Bilao 16": 2930, "Bilao 18": 3865},
+
+    "Mutton": {"Budget": 314, "Solo": 448, "Regular": 582, "Medium": 716,"Large": 850,"Jumbo": 984, "Bilao 12": 1551, "Bilao 14": 2252, "Bilao 16": 3072, "Bilao 18": 4041},
+
+    "Shrimp": { "Student": 145, "Budget": 280, "Solo": 425, "Regular": 560, "Medium": 695,"Large": 830,"Jumbo": 965, "Bilao 12": 1525, "Bilao 14": 2220, "Bilao 16": 3050, "Bilao 18": 4015},
+     
   },
+
   "Kabsah": {
-    "Chicken": { "Small": 110, "Regular": 170 },
-    "Beef": { "Small": 125, "Regular": 190 }
+    "Chicken": { "Small": 195, "Medium": 395, "Large" : 799,  },
+
+    "Beef": { "Student": 135, "Budget": 260, "Solo": 395, "Regular": 530, "Medium": 800,"Large": 800,"Jumbo": 935, "Bilao 12": 1465, "Bilao 14": 2130, "Bilao 16": 2930, "Bilao 18": 3865},
+
+    
+    "Mutton": {"Budget": 314, "Solo": 448, "Regular": 582, "Medium": 716,"Large": 850,"Jumbo": 984, "Bilao 12": 1551, "Bilao 14": 2252, "Bilao 16": 3072, "Bilao 18": 4041},
+
+     "Shrimp": { "Student": 145, "Budget": 280, "Solo": 425, "Regular": 560, "Medium": 695,"Large": 830,"Jumbo": 965, "Bilao 12": 1525, "Bilao 14": 2220, "Bilao 16": 3050, "Bilao 18": 4015},
+    
   },
+
+   "Mandi": {
+    "Chicken": { "Student": 140, "Budget": 255, "Solo": 380, "Regular": 505, "Medium": 630,"Large": 755,  "Jumbo": 880, "Bilao 12": 1385, "Bilao 14": 1970, "Bilao 16": 2710, "Bilao 18": 3575},
+
+    "Beef": { "Student": 135, "Budget": 260, "Solo": 395, "Regular": 530, "Medium": 800,"Large": 800,"Jumbo": 935, "Bilao 12": 1465, "Bilao 14": 2130, "Bilao 16": 2930, "Bilao 18": 3865},
+
+    
+    "Mutton": {"Budget": 314, "Solo": 448, "Regular": 582, "Medium": 716,"Large": 850,"Jumbo": 984, "Bilao 12": 1551, "Bilao 14": 2252, "Bilao 16": 3072, "Bilao 18": 4041},
+
+     "Shrimp": { "Student": 145, "Budget": 280, "Solo": 425, "Regular": 560, "Medium": 695,"Large": 830,"Jumbo": 965, "Bilao 12": 1525, "Bilao 14": 2220, "Bilao 16": 3050, "Bilao 18": 4015},
+    
+  },
+
+
   "Shawarma": {
     "Chicken": { "Small": 80, "Regular": 120 },
     "Beef": { "Small": 90, "Regular": 140 }
@@ -811,6 +839,3 @@ if ('serviceWorker' in navigator) {
 
 </body>
 </html>
-
-
-
