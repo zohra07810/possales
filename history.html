@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#06812b">
+<link rel="icon" href="baigsLogo.png" type="image/png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Receipt History</title>
 
@@ -578,7 +581,6 @@ const supabaseClient = supabase.createClient(
   <button onclick="showSection('expenses')">Add Expenses, FP & Grab</button>
   <button onclick="showSection('cashonhand')">Cash on Hand</button>
   <button onclick="showSection('reports')">Records</button>
-  
 
 </nav>
 
@@ -690,22 +692,40 @@ const supabaseClient = supabase.createClient(
       <button id="updateCash">Add Manual Entry</button>
     </div>
 
+ 
+
     <!-- Cash Movements -->
     <h3 style="text-align:center; margin-top:20px;">Cash Movements</h3>
-    <table id="cashMovementsTable" style="background:#dde6f0;">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>IN Details</th>
-          <th>IN Amount (₱)</th>
-          <th>OUT Details</th>
-          <th>OUT Amount (₱)</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+       <button
+  id="deleteCashTable"
+  style="margin:10px 0; background:#c0392b; color:#fff;"
+>
+  🗑 Clear All 
+</button>
+  <table id="cashMovementsTable" style="background:#dde6f0;">
+  <thead>
+    <tr>
+      <th>ID</th> <!-- new column -->
+      <th>Date</th>
+      <th>IN Details</th>
+      <th>IN Amount (₱)</th>
+      <th>OUT Details</th>
+      <th>OUT Amount (₱)</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div id="cashSaveStatus" style="margin-top:8px; font-size:14px;"></div>
+  <button id="saveCashMovements" style="margin-top:15px;">
+  Save Cash Movements
+</button>
+
 
   </div>
+
+
+
 </div>
 
 
@@ -1013,8 +1033,6 @@ const supabaseClient = supabase.createClient(
 
   </div>
 </div>
-
-
 
 
 
@@ -1546,6 +1564,20 @@ function renderExpenses() {
   });
 }
 
+
+
+// Remove a single expense by index
+function removeExpense(index) {
+  // Remove from array
+  expenses.splice(index, 1);
+
+  // Save back to localStorage
+  localStorage.setItem('expenses', JSON.stringify(expenses));
+
+  // Re-render the table
+  renderExpenses();
+}
+
 // ----------------------------
 // Add a new expense locally
 // ----------------------------
@@ -1572,6 +1604,8 @@ function addExpense() {
   priceInput.value = "";
   paymentInput.value = "";
 }
+
+
 
 function saveExpensesLocally() {
   localStorage.setItem("localExpenses", JSON.stringify(expenses));
@@ -1929,10 +1963,7 @@ function applyDeliveryFilter() {
 loadDeliveryReport();
 
 
-
-
 //CashonHand
-
 const cashTableBody = document.querySelector('#cashMovementsTable tbody');
 const currentCashSpan = document.getElementById('currentCash');
 
@@ -1942,31 +1973,80 @@ const manualOutNameInput = document.getElementById('manualOutName');
 const manualOutAmountInput = document.getElementById('manualOutAmount');
 const updateCashBtn = document.getElementById('updateCash');
 
-let manualEntries = []; // store manual IN/OUT entries
+// Load manual entries from localStorage or initialize
+let manualEntries = JSON.parse(localStorage.getItem('manualEntries')) || [];
+
+
+// Helper: create unique ID
+function generateUniqueId() {
+  return Date.now() + Math.floor(Math.random() * 1000);
+}
 
 // ============================
-// Fetch Cash Sales (cash only)
+// Manual IN/OUT Button
 // ============================
+updateCashBtn.addEventListener('click', () => {
+  const today = new Date().toISOString().split('T')[0];
+
+  // Manual IN
+  const inName = manualInNameInput.value.trim();
+  const inAmount = parseFloat(manualInAmountInput.value) || 0;
+  if (inName && inAmount > 0) {
+    const inId = 1000 + manualEntries.filter(e => e.type === 'in').length;
+    manualEntries.push({
+      id: inId,
+      type: 'in',
+      date: today,
+      details: inName,
+      amount: inAmount
+    });
+    manualInNameInput.value = '';
+    manualInAmountInput.value = '';
+  }
+
+  // Manual OUT
+  const outName = manualOutNameInput.value.trim();
+  const outAmount = parseFloat(manualOutAmountInput.value) || 0;
+  if (outName && outAmount > 0) {
+    const outId = 2000 + manualEntries.filter(e => e.type === 'out').length;
+    manualEntries.push({
+      id: outId,
+      type: 'out',
+      date: today,
+      details: outName,
+      amount: outAmount
+    });
+    manualOutNameInput.value = '';
+    manualOutAmountInput.value = '';
+  }
+
+  localStorage.setItem('manualEntries', JSON.stringify(manualEntries));
+  renderCashOnHand();
+});
+
+// ----------------------------
+// Fetch Cash Sales & Expenses
+// ----------------------------
 async function fetchCashSales() {
   const receipts = JSON.parse(localStorage.getItem("receipts")) || [];
-
   return receipts
-    .filter(r => r.payment && Number(r.payment.cash) > 0) // CASH ONLY
-    .map(r => ({
+    .filter(r => r.payment && Number(r.payment.cash) > 0)
+    .map((r, index) => ({
+      id: 1_000_000 + index, // numeric stable ID
       date: r.date || new Date().toISOString().split('T')[0],
-      details: `Store Sales`,
-      cash: Number(r.subtotal || r.payment.cash || 0) // use subtotal if available
+      details: 'Store Sales',
+      cash: Number(r.subtotal || r.payment.cash || 0)
     }));
 }
 
 async function fetchCashExpenses() {
   const today = new Date().toISOString().split('T')[0];
-
   return expenses
-    .filter(e => e.payment.toLowerCase() === 'cash') // CASH ONLY
-    .map(e => ({
-      date: today,              // use today's date
-      details: e.item,          // item name
+    .filter(e => e.payment.toLowerCase() === 'cash')
+    .map((e, index) => ({
+      id: 2_000_000 + index, // numeric stable ID
+      date: today,
+      details: e.item,
       cash: Number(e.price) || 0
     }))
     .filter(e => e.cash > 0);
@@ -1979,29 +2059,24 @@ async function renderCashOnHand() {
   const sales = await fetchCashSales();
   const expenses = await fetchCashExpenses();
 
-  // Combine all entries
   let movements = [];
 
-  sales.forEach(s => movements.push({ date: s.date, inDetails: s.details, inAmount: s.cash, outDetails: '', outAmount: 0 }));
-  expenses.forEach(e => movements.push({ date: e.date, inDetails: '', inAmount: 0, outDetails: e.details, outAmount: e.cash }));
+  sales.forEach(s => movements.push({ id: s.id, date: s.date, inDetails: s.details, inAmount: s.cash, outDetails: '', outAmount: 0 }));
+  expenses.forEach(e => movements.push({ id: e.id, date: e.date, inDetails: '', inAmount: 0, outDetails: e.details, outAmount: e.cash }));
   manualEntries.forEach(m => {
-    if (m.type === 'in') movements.push({ date: m.date, inDetails: m.details, inAmount: m.amount, outDetails: '', outAmount: 0 });
-    if (m.type === 'out') movements.push({ date: m.date, inDetails: '', inAmount: 0, outDetails: m.details, outAmount: m.amount });
+    if (m.type === 'in') movements.push({ id: m.id, date: m.date, inDetails: m.details, inAmount: m.amount, outDetails: '', outAmount: 0 });
+    if (m.type === 'out') movements.push({ id: m.id, date: m.date, inDetails: '', inAmount: 0, outDetails: m.details, outAmount: m.amount });
   });
 
-  // Sort by date ascending
   movements.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  // Clear table
   cashTableBody.innerHTML = '';
-
-  // Render rows & calculate current cash
   let currentCash = 0;
   movements.forEach(m => {
     currentCash += m.inAmount - m.outAmount;
-
     const row = document.createElement('tr');
     row.innerHTML = `
+       <td>${m.id}</td>  <!-- show ID -->
       <td>${m.date}</td>
       <td>${m.inDetails}</td>
       <td>₱${m.inAmount.toFixed(2)}</td>
@@ -2015,31 +2090,123 @@ async function renderCashOnHand() {
 }
 
 // ============================
-// Manual IN/OUT Button
+// Save to Supabase using ID to prevent duplicates
 // ============================
-updateCashBtn.addEventListener('click', () => {
-  const inName = manualInNameInput.value.trim();
-  const inAmount = parseFloat(manualInAmountInput.value) || 0;
-  if (inName && inAmount > 0) {
-    manualEntries.push({ type: 'in', date: new Date().toISOString().split('T')[0], details: inName, amount: inAmount });
-    manualInNameInput.value = '';
-    manualInAmountInput.value = '';
+async function getAllCashMovements() {
+  const sales = await fetchCashSales();
+  const expenses = await fetchCashExpenses();
+
+  let movements = [];
+
+  sales.forEach(s => movements.push({
+    id: s.id,
+    date: s.date,
+    inDetails: s.details,
+    inAmount: Number(s.cash) || 0,
+    outDetails: '',
+    outAmount: 0
+  }));
+
+  expenses.forEach(e => movements.push({
+    id: e.id,
+    date: e.date,
+    inDetails: '',
+    inAmount: 0,
+    outDetails: e.details,
+    outAmount: Number(e.cash) || 0
+  }));
+
+  manualEntries.forEach(m => movements.push({
+    id: m.id,
+    date: m.date,
+    inDetails: m.type === 'in' ? m.details : '',
+    inAmount: m.type === 'in' ? Number(m.amount) : 0,
+    outDetails: m.type === 'out' ? m.details : '',
+    outAmount: m.type === 'out' ? Number(m.amount) : 0
+  }));
+
+  return movements;
+}
+
+async function saveCashMovementsToSupabase() {
+  const status = document.getElementById('cashSaveStatus');
+  if (status) status.textContent = 'Saving...';
+
+  const movements = await getAllCashMovements();
+  if (!movements.length) {
+    if (status) status.textContent = 'No data to save';
+    return;
   }
 
-  const outName = manualOutNameInput.value.trim();
-  const outAmount = parseFloat(manualOutAmountInput.value) || 0;
-  if (outName && outAmount > 0) {
-    manualEntries.push({ type: 'out', date: new Date().toISOString().split('T')[0], details: outName, amount: outAmount });
-    manualOutNameInput.value = '';
-    manualOutAmountInput.value = '';
+  const payload = movements.map(m => ({
+    id: m.id,             // use unique id
+    date: m.date,
+    in_details: m.inDetails || null,
+    in_amount: Number(m.inAmount) || 0,
+    out_details: m.outDetails || null,
+    out_amount: Number(m.outAmount) || 0
+  }));
+
+  const { error } = await supabaseClient
+    .from('cash_movements')
+    .upsert(payload, { onConflict: 'id' }); // use id to prevent duplicates
+
+  if (error) {
+    console.error('Supabase save error:', error);
+    if (status) status.textContent = '❌ Save failed';
+  } else {
+    if (status) status.textContent = '✅ Cash movements saved';
   }
+}
 
-  renderCashOnHand();
-});
-
+// ============================
+// Auto-save every 1 min + Save button
+// ============================
+document.getElementById('saveCashMovements')?.addEventListener('click', saveCashMovementsToSupabase);
+setInterval(() => {
+  saveCashMovementsToSupabase();
+}, 1 * 60 * 1000);
 
 // Initial render
 renderCashOnHand();
+
+
+document
+  .getElementById('deleteCashTable')
+  ?.addEventListener('click', async () => {
+
+    const ok = confirm(
+      'This will permanently DELETE ALL cash movements\n(local + Supabase).\n\nContinue?'
+    );
+    if (!ok) return;
+
+    // 1️⃣ Clear local manual entries
+    manualEntries = [];
+    localStorage.removeItem('manualEntries');
+
+    // 2️⃣ Clear table UI completely
+    cashTableBody.innerHTML = '';
+    currentCashSpan.textContent = '0.00';
+
+    // Optional: clear sales/expenses preview if you want
+    // localStorage.removeItem('receipts');
+    // localStorage.removeItem('expenses');
+
+    // 3️⃣ Delete ALL rows from Supabase
+    const { error } = await supabaseClient
+      .from('cash_movements')
+      .delete()
+      .neq('id', 0); // Delete all rows
+
+    if (error) {
+      console.error('Supabase delete error:', error);
+      alert('❌ Failed to delete data from Supabase');
+    } else {
+      alert('✅ All cash movements deleted');
+    }
+  });
+
+
 
 
 // ==============================
@@ -2057,6 +2224,12 @@ setInterval(autoRefreshAll, 5000);
 
 // INITIAL LOAD
 autoRefreshAll();
+
+
+
+
+//SUMMARY
+
 
 
 </script>
