@@ -519,9 +519,7 @@ const menu = {
 
 
   "Hummus": {
-  "Hummus": 144,
-  "Hummus w/ Khubz": 166,
-  "Hummus w/ Khubz & Salatah": 227,
+    "Hummus":{"Hummus only": 144, "Hummus w/ Khubz": 166, "Hummus w/ Khubz & Salatah": 227}
 },
 
   "Haleem": {
@@ -545,7 +543,8 @@ const menu = {
   },
 
  "Drinks": {
-  "Soda in can":55,
+  "Softdrinks": { "Coke in can": 55, "Sprite in can": 55, "Royal in can": 55, "Pepsi in can": 55, "Mismo": 35},
+  "Bottled Water": { "Small": 15, "Big": 25},
   "Lemonade": { "Small": 79, "Large": 101, "Big": 149, "Pitcher": 250},
   "Black Chai": { "Cup": 55, "Kettle": 115},
   "Chai w/ Milk": { "Cup": 70, "Kettle": 135},
@@ -557,57 +556,31 @@ const menu = {
 },
 
 "Pita": {
-  "Chappati":25,
+  "Chappati": { "1 piece": 25},
   "Khuboos": { "Small": 17, "Large": 23, "Small Pack": 165, "Large Pack": 110},
   "Paratha": { "Plain": 55, "w/ Cheese": 65, "w/ Butter": 65, "w/ Sugar": 65, "w/ Garlic": 65, "w/ Egg": 99,"Aloo": 105}, 
 },
 
 "Samosa": {
-  "Plain Veggies":25,
-  "Chicken & Veggies":35,
-  "Chicken & Veggies w/ cheese":45,
-  "Chicken all meat":40,
-  "Chicken & Cheese":50,
-  "Beef & Veggies":45,
-  "Beef & Veggies w/ Cheese":55,
-  "Beef all meat":50,
-  "Beef & Cheese":60,
+   "Plain": { "Plain Veggies":25},
+   "Chicken": { "Chicken & Veggies":35, "Chicken & Veggies w/ cheese":45, "Chicken all meat":40, "Chicken & Cheese":50},
+   "Beef": {"Beef & Veggies":45,"Beef & Veggies w/ Cheese":55,  "Beef all meat":50,  "Beef & Cheese":60}
 },
 
 "Add-ons": {
-  "Biryani Rice":55,
+  "Rice": { "Biryani": 55,"Kabsah": 55, "White": 35},
   "Fries": { "Small": 25, "Regular": 50, "Medium": 75, "Large": 100, "Jumbo": 125},
   "Garlic Sauce": { "2.5oz": 35, "3.5oz": 45, "250ml": 140},
   "Hot Sauce": { "2.5oz": 35, "3.5oz": 45, "250ml": 140},
   "Salatah": { "2.5oz": 25, "3.5oz": 35, "250ml": 140}, 
-  "Raita":125,
-  "Palapa":199, 
+  "Raita": { "Tub": 125},
+  "Palapa": { "Tub": 199},
 },
 
 "Combos": {
-  "Combo 1":99,
-  "Combo 2":159,
-  "Combo 3":210,
-  "Combo 4":193,
-  "Combo 5":176,
-  "Combo 6":222,
-  "Combo 7":159,
-  "Combo 8":129,
-  "Combo 9":251,
-  "Combo 10":206,
-  "Combo A":201,
-  "Combo B":247,
-  "Combo C":229,
-  "Combo D":247,
-  "Combo E":178,
-  "Combo F":155,
-  "Combo G":155,
-  "Combo H":133,
-  "Combo i":268,
-  "Combo J":245,
-  "Combo K":237,
-  "Combo L":278,
-
+  "Combo 1-10": {  "Combo 1":99,  "Combo 2":159,   "Combo 3":210, "Combo 4":193,"Combo 5":176,"Combo 6":222,"Combo 7":159,"Combo 8":129,"Combo 9":251,"Combo 10":206},
+  "Combo A-L": {  "Combo A":201,   "Combo B":247,  "Combo C":229,  "Combo D":247,  "Combo E":178,"Combo F":155, "Combo G":155,  "Combo H":133, "Combo i":268, "Combo J":245,"Combo K":237, "Combo L":278,},
+  
 }
   
 };
@@ -1016,5 +989,6 @@ if ('serviceWorker' in navigator) {
 
 </body>
 </html>
+
 
 
