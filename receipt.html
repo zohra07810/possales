@@ -126,6 +126,8 @@ button {
   width: 90px;
   padding: 4px;
   font-size: 14px;
+  border-color: #d1ff04;     /* focused border */
+  box-shadow: 0 0 0 2px rgba(114, 0, 63, 0.2);
 }
 
 /* Waitlist Modal CSS */
@@ -172,7 +174,7 @@ button {
 
   <div class="line"></div>
 
-  <table>
+  <table id="totalsTable">
     <tr>
       <td>Subtotal</td>
       <td class="right" id="subtotal"></td>
@@ -280,6 +282,9 @@ button {
 
 
 <script>
+
+
+
 // =======================
 // LOAD CART & CALCULATIONS
 // =======================
@@ -330,10 +335,23 @@ document.getElementById("subtotal").textContent = "₱" + subtotal.toFixed(2);
 document.getElementById("discountText").textContent = "-₱" + discountAmount.toFixed(2);
 document.getElementById("total").textContent = "₱" + finalTotal.toFixed(2);
 
-// Show service type on receipt
+const totalsTable = document.getElementById("totalsTable");
+
+// Get cashier from localStorage
+const savedCashier = localStorage.getItem("cashier") || "—";
+
+// Insert into totalsTable for receipt display
 const serviceRow = document.createElement("tr");
-serviceRow.innerHTML = `<td>Service Type: </td><td class="right">${service}</td>`;
-itemsTable.parentNode.insertBefore(serviceRow, itemsTable.nextSibling.nextSibling); // insert after items table
+serviceRow.innerHTML = `<td>Service Type:</td><td class="right">${service}</td>`;
+
+const cashierRow = document.createElement("tr");
+cashierRow.innerHTML = `<td>Cashier:</td><td class="right">${savedCashier}</td>`;
+
+
+// Insert Service and Cashier above subtotal (at the top)
+totalsTable.insertBefore(cashierRow, totalsTable.firstChild); // Cashier first
+totalsTable.insertBefore(serviceRow, totalsTable.firstChild); // Then Service
+
 
 // =======================
 // NAVIGATION
@@ -422,7 +440,9 @@ document.getElementById("saveYes").addEventListener("click", () => {
       gcash: parseFloat(document.getElementById("payGCash").value) || 0,
       bank: parseFloat(document.getElementById("payBank").value) || 0
     },
-    service
+    service,
+    cashier: savedCashier
+    
   };
 
   let receipts = JSON.parse(localStorage.getItem("receipts")) || [];
@@ -433,41 +453,10 @@ document.getElementById("saveYes").addEventListener("click", () => {
   window.location.href = "history.html";
 });
 
-// Save receipt
-document.getElementById("saveYes").addEventListener("click", () => {
-  const paidTotal = getPaymentTotal();
-  if (paidTotal !== total) {
-    alert("Payment amount must equal total ₱" + total.toFixed(2));
-    return;
-  }
-
-  const receiptObj = {
-    id: Date.now(),
-    date: new Date().toLocaleString(),
-    items: cart,
-    subtotal,
-    discount: discountAmount,
-    total,
-    payment: {
-      cash: parseFloat(document.getElementById("payCash").value) || 0,
-      gcash: parseFloat(document.getElementById("payGCash").value) || 0,
-      bank: parseFloat(document.getElementById("payBank").value) || 0
-    },
-    service: document.getElementById("serviceSelect").value
-  };
-
-  let receipts = JSON.parse(localStorage.getItem("receipts")) || [];
-  receipts.push(receiptObj);
-  localStorage.setItem("receipts", JSON.stringify(receipts));
-
+// Cancel button closes the save modal
+document.getElementById("saveCancel").addEventListener("click", () => {
   closeSaveModal();
-  window.location.href = "history.html";
 });
-
-document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
-
-
-
 
 // =======================
 // WAITLIST
