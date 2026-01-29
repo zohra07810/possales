@@ -433,7 +433,13 @@ h1, h2, h3 {
  
   }
 
-  
+   @media (max-width: 480px) {
+    .manual-cash-row label,
+    .manual-cash-row input {
+      flex: 1 1 100%;  /* stack vertically */
+      min-width: auto;
+    }
+  }
 
 /* =====================
    ANIMATION
@@ -588,9 +594,7 @@ const supabaseClient = supabase.createClient(
 <!-- SECTIONS -->
 <div id="receipts"><br>
   <h1>Receipts History</h1>
-  <div style="text-align:center; margin:15px 0;">
-    <button class="back-btn" onclick="goBack()">⬅ Back to POS</button>
-  </div>
+  
 
   <!-- Payment Summary -->
   <div id="paymentSummary" style="text-align:center; margin-top: 10px; font-weight: bold; font-size: 14px;"></div>
@@ -626,6 +630,10 @@ const supabaseClient = supabase.createClient(
 
   <div style="text-align:center; margin-top:15px;">
     <button class="view-btn" style="background: #72003f;" onclick="openReportModal()">➕ REPORT</button>
+  </div><br><br>
+
+  <div style="text-align:center; margin:15px 0;">
+    <button class="back-btn" onclick="goBack()">⬅ Back to POS</button>
   </div>
 
   <div id="reportModal">
@@ -664,65 +672,80 @@ const supabaseClient = supabase.createClient(
 
 </div>
 
-
 <!-- CASH ON HAND SECTION -->
-<div id="cashonhand" style="display:none;">
+<div id="cashonhand" style="display:none; padding:10px;">
 
   <div class="cash-on-hand">
     <h2 style="text-align:center;">Cash on Hand</h2>
 
-    <div id="currentCashContainer" style="color:#152166;">
+    <div id="currentCashContainer" style="color:#152166; text-align:center; margin-bottom:10px;">
       Current Cash: ₱<span id="currentCash">0.00</span>
     </div>
 
-    <!-- Manual IN / OUT -->
-    <div class="manual-cash-form">
-      <div class="manual-cash-row">
-        <label for="manualInName">Manual IN:</label>
-        <input type="text" id="manualInName" placeholder="Details">
-        <input type="number" id="manualInAmount" placeholder="0.00">
-      </div>
-
-      <div class="manual-cash-row">
-        <label for="manualOutName">Manual OUT:</label>
-        <input type="text" id="manualOutName" placeholder="Details">
-        <input type="number" id="manualOutAmount" placeholder="0.00">
-      </div>
-
-      <button id="updateCash">Add Manual Entry</button>
-    </div>
-
- 
 
     <!-- Cash Movements -->
     <h3 style="text-align:center; margin-top:20px;">Cash Movements</h3>
-       <button
-  id="deleteCashTable"
-  style="margin:10px 0; background:#c0392b; color:#fff;"
->
-  🗑 Clear All 
-</button>
-  <table id="cashMovementsTable" style="background:#dde6f0;">
-  <thead>
-    <tr>
-      <th>ID</th> <!-- new column -->
-      <th>Date</th>
-      <th>IN Details</th>
-      <th>IN Amount (₱)</th>
-      <th>OUT Details</th>
-      <th>OUT Amount (₱)</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
 
-<div id="cashSaveStatus" style="margin-top:8px; font-size:14px;"></div>
-  <button id="saveCashMovements" style="margin-top:15px;">
-  Save Cash Movements
-</button>
+    <div style="overflow-x:auto;"> <!-- makes table scrollable on small screens -->
+      <table id="cashMovementsTable" style="background:#dde6f0; width:100%; min-width:700px; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th>IN Details</th>
+            <th>IN Amount (₱)</th>
+            <th>OUT Details</th>
+            <th>OUT Amount (₱)</th>
+            <th>Cashier</th>
+            <th>Date</th>
+            <th>ID</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="cashSaveStatus" style="margin-top:8px; font-size:14px;"></div>
+    <button id="saveCashMovements" style="margin-top:15px; width:50%;">
+      Save Cash Movements
+    </button>
+    <br><br>
+    <button id="deleteCashTable" style="margin:10px 0; background:#c0392b; color:#fff;">
+      🗑 Clear All 
+    </button>
+
+    <!-- Manual IN / OUT -->
+<div class="manual-cash-form" style="margin-bottom:15px;">
+
+  <!-- Manual IN -->
+  <div style="margin-bottom:10px;">
+    <div style="font-weight:bold; margin-bottom:5px;">Manual IN:</div>
+    <div style="display:flex; flex-wrap:wrap; gap:5px;">
+      <input type="text" id="manualInName" placeholder="Details" style="flex:2 1 120px; min-width:100px; padding:6px;">
+      <input type="number" id="manualInAmount" placeholder="₱0.00" style="flex:1 1 80px; min-width:70px; padding:6px;">
+      <input type="text" id="manualInCashier" placeholder="Cashier" style="flex:1 1 100px; min-width:80px; padding:6px;">
+    </div>
+  </div>
+
+  <!-- Manual OUT 
+  <div style="margin-bottom:10px;">
+    <div style="font-weight:bold; margin-bottom:5px;">Manual OUT:</div>
+    <div style="display:flex; flex-wrap:wrap; gap:5px;">
+      <input type="text" id="manualOutName" placeholder="Details" style="flex:2 1 120px; min-width:100px; padding:6px;">
+      <input type="number" id="manualOutAmount" placeholder="₱0.00" style="flex:1 1 80px; min-width:70px; padding:6px;">
+      <input type="text" id="manualOutCashier" placeholder="Cashier" style="flex:1 1 100px; min-width:80px; padding:6px;">
+    </div>
+  </div>-->
+
+  <button id="updateCash" style="width:100%; padding:8px; font-size:14px;">
+    Add Manual Entry
+  </button>
+</div>
 
 
   </div>
+</div>
+
+
+
 
 
 
@@ -942,96 +965,103 @@ const supabaseClient = supabase.createClient(
   
 
 </div>
-
 <!-- Add Expenses Section -->
-<div id="expenses" style="display:none; margin-top: 20px;">
-  <h2 style="text-align:center;">💸 Add Expenses</h2>
+<div id="expenses" style="display:none; margin:20px auto; max-width:700px; padding:20px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
 
-  <!-- Input Form -->
-  <div style="max-width:400px; margin:10px auto; text-align:center;">
-    <input 
-      type="text" 
-      id="expenseName" 
-      placeholder="Expense Item" 
-      style="width: 100%; padding:8px; margin-bottom:8px; border-radius:5px; border:1px solid #ccc;"
-    >
-    <input 
-      type="number" 
-      id="expensePrice" 
-      placeholder="Price" 
-      style="width: 80%; padding:8px; margin-bottom:8px; border-radius:5px; border:1px solid #ccc;"
-    >
+  <!-- ===== Sub-section 1: Add Expenses ===== -->
+  <div style="background:#118f0d; padding:20px; border-radius:10px; margin-bottom:20px;">
+    <h2 style="text-align:center; margin-bottom:20px; color:white;">💸 Add Expenses</h2>
 
-    <select 
-  id="expensePayment"
-  style="width: 80%; padding:8px; margin-bottom:8px; border-radius:5px; border:1px solid #ccc;"
->
-  <option value="">Payment Method</option>
-  <option value="Cash">Cash</option>
-  <option value="GCash">GCash</option>
-  <option value="Bank">Bank</option>
-</select>
+    <!-- Input Form -->
+    <div style="text-align:center; margin-bottom:20px;">
+      <input 
+        type="text" 
+        id="expenseName" 
+        placeholder="Expense Item" 
+        style="width: 100%; padding:8px; margin-bottom:8px; border-radius:5px; border:1px solid #ccc;"
+      >
+      <input 
+        type="number" 
+        id="expensePrice" 
+        placeholder="Price" 
+        style="width: 80%; padding:8px; margin-bottom:8px; border-radius:5px; border:1px solid #ccc;"
+      >
 
-    <button class="view-btn" onclick="addExpense()">Add Expense</button>
-  </div>
+      <input 
+        type="text" 
+        id="expenseCashier" 
+        placeholder="Cashier" 
+        style="width: 60%; padding:8px; margin-left:4%; margin-bottom:8px; border-radius:5px; border:1px solid #ccc;"
+      >
 
-  <!-- Preview Table -->
-<div class="table-container table-scroll-3"
-     style="max-width:600px; margin:20px auto;">
-  <table style="width:100%; border-collapse:collapse;">
-    <thead>
-      <tr>
-        <th>Item</th>
-        <th>Price</th>
-        <th>Payment</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
+      <select 
+        id="expensePayment"
+        style="width: 80%; padding:8px; margin-bottom:8px; border-radius:5px; border:1px solid #ccc;"
+      >
+        <option value="">Payment Method</option>
+        <option value="Cash">Cash</option>
+        <option value="GCash">GCash</option>
+        <option value="Bank">Bank</option>
+      </select>
 
-    <tbody id="expensesTableBody">
-      <!-- Dynamically filled by JS -->
-    </tbody>
-  </table>
-</div>
-
-  <!-- Add to Report Button -->
-  <div style="text-align:center; margin-top:10px;">
-    <button class="view-btn" style="background: #72003f;" onclick="addExpensesToReport()">➕ REPORT</button>
-  </div>
-<br>
-  
-<!-- Foodpanda & Grab Sales Input Card -->
-<div class="table-container" style="max-width:500px; margin:20px auto; padding:15px; background:#eb87f8;">
-  <h3 style="text-align:center; margin-bottom:15px;">🚀 Online Platform Sales</h3>
-
-  <!-- Input Form -->
-  <div style="display:flex; flex-direction:column; gap:10px; max-width:400px; margin:0 auto;">
-
-    <!-- Foodpanda -->
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <label for="foodpandaSales">Foodpanda Sales:</label>
-      <input type="number" id="foodpandaSales" placeholder="₱0.00" style="width:150px; padding:6px; border-radius:5px; border:1px solid #ccc;">
+      <button class="view-btn" onclick="addExpense()" style="margin-top:8px;">Add Expense</button>
+      <button class="view-btn" onclick="goToCashOnHand()" style="background:#b3c704; color:white;">Go to Cash on Hand</button>
     </div>
 
-     <!-- Calculated Total -->
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <span>Total After Foodpanda 30%:</span>
-      <span id="foodpandaTotal">₱0.00</span>
+    <!-- Preview Table -->
+    <div class="table-container table-scroll-3" style="max-width:100%; margin:0 auto 20px;">
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Payment</th>
+            <th>Cashier</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="expensesTableBody">
+          <!-- Dynamically filled by JS -->
+        </tbody>
+      </table>
     </div>
 
-    <!-- Grab -->
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <label for="grabSales">Grab Sales:</label>
-      <input type="number" id="grabSales" placeholder="₱0.00" style="width:150px; padding:6px; border-radius:5px; border:1px solid #ccc;">
-    </div>
-
-   
-
+    <!-- Add to Report Button -->
     <div style="text-align:center; margin-top:10px;">
-      <button class="view-btn" style="background: #72003f;" onclick="addDeliverySales()">➕ REPORT</button>
+      <button class="view-btn" style="background: #72003f; color:white; padding:8px 16px; border:none; border-radius:5px;" onclick="addExpensesToReport()">➕ REPORT</button>
     </div>
-
   </div>
+
+  <!-- ===== Sub-section 2: Online Platform Sales ===== -->
+  <div style="background:#eb87f8; padding:20px; border-radius:10px;">
+    <h3 style="text-align:center; margin-bottom:15px;">🚀 Online Platform Sales</h3>
+
+    <div style="display:flex; flex-direction:column; gap:10px; max-width:400px; margin:0 auto;">
+      <!-- Foodpanda -->
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <label for="foodpandaSales">Foodpanda Sales:</label>
+        <input type="number" id="foodpandaSales" placeholder="₱0.00" style="width:150px; padding:6px; border-radius:5px; border:1px solid #ccc;">
+      </div>
+
+      <!-- Calculated Total -->
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span>Total After Foodpanda 30%:</span>
+        <span id="foodpandaTotal">₱0.00</span>
+      </div>
+
+      <!-- Grab -->
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <label for="grabSales">Grab Sales:</label>
+        <input type="number" id="grabSales" placeholder="₱0.00" style="width:150px; padding:6px; border-radius:5px; border:1px solid #ccc;">
+      </div>
+
+      <!-- Add to Report Button -->
+      <div style="text-align:center; margin-top:10px;">
+        <button class="view-btn" style="background: #72003f; color:white; padding:8px 16px; border:none; border-radius:5px;" onclick="addDeliverySales()">➕ REPORT</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 
@@ -1116,6 +1146,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <strong>ID:</strong> ${r.id}<br>
       <strong>Date:</strong> ${r.date}<br>
       <strong>Service:</strong> ${r.service}<br><br>
+      <strong>Cashier:</strong> ${r.cashier || '—'}<br><br>
       <strong>Payment</strong><br>
       Cash: ₱${(r.payment.cash || 0).toFixed(2)}<br>
       GCash: ₱${(r.payment.gcash || 0).toFixed(2)}<br>
@@ -1292,6 +1323,7 @@ function openReportModal(){
   document.getElementById("reportModal").style.display="flex";
 }
 function closeReportModal(){ document.getElementById("reportModal").style.display="none"; }
+
 async function confirmAddToReport() {
   closeReportModal();
 
@@ -1313,7 +1345,8 @@ async function confirmAddToReport() {
     payment: r.payment,
     subtotal: r.subtotal,
     discount: r.discount,
-    total: r.total
+    total: r.total,
+    cashier: r.cashier || '—'
   }));
 
   // Save to Supabase
@@ -1531,9 +1564,6 @@ loadSalesReport();
 let expenses = JSON.parse(localStorage.getItem("localExpenses")) || [];
 
 
-// ----------------------------
-// Render local expenses table
-// ----------------------------
 function renderExpenses() {
   const tbody = document.getElementById("expensesTableBody");
   tbody.innerHTML = "";
@@ -1541,7 +1571,7 @@ function renderExpenses() {
   if (expenses.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="4" style="text-align:center;color:#999;">
+        <td colspan="5" style="text-align:center;color:#999;">
           No expenses added
         </td>
       </tr>`;
@@ -1554,10 +1584,9 @@ function renderExpenses() {
       <td>${exp.item}</td>
       <td>₱${Number(exp.price).toFixed(2)}</td>
       <td>${exp.payment}</td>
+      <td>${exp.cashier}</td> <!-- show cashier -->
       <td>
-        <button class="delete-btn" onclick="removeExpense(${index})">
-          Delete
-        </button>
+        <button class="delete-btn" onclick="removeExpense(${index})">Delete</button>
       </td>
     `;
     tbody.appendChild(row);
@@ -1585,24 +1614,28 @@ function addExpense() {
   const nameInput = document.getElementById("expenseName");
   const priceInput = document.getElementById("expensePrice");
   const paymentInput = document.getElementById("expensePayment");
+  const cashierInput = document.getElementById("expenseCashier"); // new
 
   const item = nameInput.value.trim();
   const price = parseFloat(priceInput.value);
   const payment = paymentInput.value;
+  const cashier = cashierInput.value.trim() || '—'; // default if empty
 
   if (!item || isNaN(price) || !payment) {
-    alert("Please fill in item, price, and payment method.");
+    alert("Please fill in item, price, payment method.");
     return;
   }
 
-  expenses.push({ item, price, payment });
+  expenses.push({ item, price, payment, cashier }); // add cashier
 
-  saveExpensesLocally();   // ✅ persist
+  saveExpensesLocally();
   renderExpenses();
 
+  // Clear inputs
   nameInput.value = "";
   priceInput.value = "";
   paymentInput.value = "";
+  cashierInput.value = "";
 }
 
 
@@ -1610,7 +1643,6 @@ function addExpense() {
 function saveExpensesLocally() {
   localStorage.setItem("localExpenses", JSON.stringify(expenses));
 }
-
 async function addExpensesToReport() {
   if (expenses.length === 0) {
     alert("No expenses to add.");
@@ -1620,7 +1652,8 @@ async function addExpensesToReport() {
   const payload = expenses.map(exp => ({
     item: exp.item,
     price: exp.price,
-    payment: { cash: exp.payment.toLowerCase() === "cash" ? exp.price : 0 }
+    payment: { cash: exp.payment.toLowerCase() === "cash" ? exp.price : 0 },
+    cashier: exp.cashier // added
   }));
 
   const { error } = await supabaseClient
@@ -1633,7 +1666,6 @@ async function addExpensesToReport() {
     return;
   }
 
-  // ✅ Clear ONLY after success
   expenses = [];
   localStorage.removeItem("localExpenses");
 
@@ -1641,9 +1673,6 @@ async function addExpensesToReport() {
   alert("Expenses added successfully ✅");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderExpenses();
-});
 // ==============================
 // LOAD EXPENSES REPORT
 // ==============================
@@ -1964,13 +1993,16 @@ loadDeliveryReport();
 
 
 //CashonHand
+//CashonHand
 const cashTableBody = document.querySelector('#cashMovementsTable tbody');
 const currentCashSpan = document.getElementById('currentCash');
 
 const manualInNameInput = document.getElementById('manualInName');
 const manualInAmountInput = document.getElementById('manualInAmount');
+const manualInCashierInput = document.getElementById('manualInCashier'); // <-- added
 const manualOutNameInput = document.getElementById('manualOutName');
 const manualOutAmountInput = document.getElementById('manualOutAmount');
+const manualOutCashierInput = document.getElementById('manualOutCashier'); // <-- added
 const updateCashBtn = document.getElementById('updateCash');
 
 // Load manual entries from localStorage or initialize
@@ -1991,39 +2023,46 @@ updateCashBtn.addEventListener('click', () => {
   // Manual IN
   const inName = manualInNameInput.value.trim();
   const inAmount = parseFloat(manualInAmountInput.value) || 0;
+  const inCashier = manualInCashierInput.value.trim() || '—';
   if (inName && inAmount > 0) {
     const inId = 1000 + manualEntries.filter(e => e.type === 'in').length;
     manualEntries.push({
-      id: inId,
+    
       type: 'in',
-      date: today,
       details: inName,
-      amount: inAmount
+      amount: inAmount,
+      cashier: inCashier,
+      date: today,
+      id: inId,
     });
     manualInNameInput.value = '';
     manualInAmountInput.value = '';
+    manualInCashierInput.value = '';
   }
 
   // Manual OUT
   const outName = manualOutNameInput.value.trim();
   const outAmount = parseFloat(manualOutAmountInput.value) || 0;
+  const outCashier = manualOutCashierInput.value.trim() || '—';
   if (outName && outAmount > 0) {
     const outId = 2000 + manualEntries.filter(e => e.type === 'out').length;
     manualEntries.push({
-      id: outId,
+      
       type: 'out',
-      date: today,
       details: outName,
-      amount: outAmount
+      amount: outAmount,
+      cashier: outCashier,
+      date: today,
+      id: outId,
     });
     manualOutNameInput.value = '';
     manualOutAmountInput.value = '';
+    manualOutCashierInput.value = '';
   }
 
   localStorage.setItem('manualEntries', JSON.stringify(manualEntries));
   renderCashOnHand();
 });
-
 // ----------------------------
 // Fetch Cash Sales & Expenses
 // ----------------------------
@@ -2032,10 +2071,11 @@ async function fetchCashSales() {
   return receipts
     .filter(r => r.payment && Number(r.payment.cash) > 0)
     .map((r, index) => ({
-      id: 1_000_000 + index, // numeric stable ID
-      date: r.date || new Date().toISOString().split('T')[0],
       details: 'Store Sales',
-      cash: Number(r.subtotal || r.payment.cash || 0)
+      cash: Number(r.subtotal || r.payment.cash || 0),
+      cashier: r.cashier || '—',
+      date: r.date || new Date().toISOString().split('T')[0],
+      id: 1_000_000 + index, // numeric stable ID
     }));
 }
 
@@ -2044,10 +2084,12 @@ async function fetchCashExpenses() {
   return expenses
     .filter(e => e.payment.toLowerCase() === 'cash')
     .map((e, index) => ({
-      id: 2_000_000 + index, // numeric stable ID
-      date: today,
+
       details: e.item,
-      cash: Number(e.price) || 0
+      cash: Number(e.price) || 0,
+      cashier: e.cashier || '—',
+      date: today,
+      id: 2_000_000 + index, // numeric stable ID
     }))
     .filter(e => e.cash > 0);
 }
@@ -2056,39 +2098,79 @@ async function fetchCashExpenses() {
 // Render Cash Movements Table
 // ============================
 async function renderCashOnHand() {
-  const sales = await fetchCashSales();
-  const expenses = await fetchCashExpenses();
+  const sales = await fetchCashSales();      // your sales fetch function
+  const expenses = await fetchCashExpenses(); // your expenses fetch function
 
   let movements = [];
 
-  sales.forEach(s => movements.push({ id: s.id, date: s.date, inDetails: s.details, inAmount: s.cash, outDetails: '', outAmount: 0 }));
-  expenses.forEach(e => movements.push({ id: e.id, date: e.date, inDetails: '', inAmount: 0, outDetails: e.details, outAmount: e.cash }));
+  // Add sales
+  sales.forEach(s => movements.push({
+    inDetails: s.details,
+    inAmount: s.cash,
+    outDetails: '',
+    outAmount: 0,
+    cashier: s.cashier || '—',
+     date: s.date, 
+      id: s.id
+  }));
+
+  // Add expenses
+  expenses.forEach(e => movements.push({
+    inDetails: '',
+    inAmount: 0,
+    outDetails: e.details,
+    outAmount: e.cash,
+    cashier: e.cashier || '—',
+     date: e.date,
+    id: e.id
+  }));
+
+  // Add manual entries
   manualEntries.forEach(m => {
-    if (m.type === 'in') movements.push({ id: m.id, date: m.date, inDetails: m.details, inAmount: m.amount, outDetails: '', outAmount: 0 });
-    if (m.type === 'out') movements.push({ id: m.id, date: m.date, inDetails: '', inAmount: 0, outDetails: m.details, outAmount: m.amount });
+    if (m.type === 'in') movements.push({
+      inDetails: m.details,
+      inAmount: m.amount,
+      outDetails: '',
+      outAmount: 0,
+      cashier: m.cashier,
+      date: m.date,
+      id: m.id
+    });
+    if (m.type === 'out') movements.push({
+      
+      inDetails: '',
+      inAmount: 0,
+      outDetails: m.details,
+      outAmount: m.amount,
+      cashier: m.cashier,
+       date: m.date,
+       id: m.id
+    });
   });
 
   movements.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   cashTableBody.innerHTML = '';
   let currentCash = 0;
+
   movements.forEach(m => {
     currentCash += m.inAmount - m.outAmount;
+
     const row = document.createElement('tr');
     row.innerHTML = `
-       <td>${m.id}</td>  <!-- show ID -->
-      <td>${m.date}</td>
       <td>${m.inDetails}</td>
       <td>₱${m.inAmount.toFixed(2)}</td>
       <td>${m.outDetails}</td>
       <td>₱${m.outAmount.toFixed(2)}</td>
+      <td>${m.cashier || '—'}</td>
+      <td>${m.date}</td>
+      <td>${m.id}</td>
     `;
     cashTableBody.appendChild(row);
   });
 
   currentCashSpan.textContent = currentCash.toFixed(2);
 }
-
 // ============================
 // Save to Supabase using ID to prevent duplicates
 // ============================
@@ -2099,30 +2181,35 @@ async function getAllCashMovements() {
   let movements = [];
 
   sales.forEach(s => movements.push({
-    id: s.id,
-    date: s.date,
+
     inDetails: s.details,
     inAmount: Number(s.cash) || 0,
     outDetails: '',
-    outAmount: 0
+    outAmount: 0,
+    cashier: s.cashier || '—',
+    date: s.date,
+    id: s.id
   }));
 
   expenses.forEach(e => movements.push({
-    id: e.id,
-    date: e.date,
+    
     inDetails: '',
     inAmount: 0,
     outDetails: e.details,
-    outAmount: Number(e.cash) || 0
+    outAmount: Number(e.cash) || 0,
+    cashier: e.cashier || '—',
+    date: e.date,
+    id: e.id
   }));
 
   manualEntries.forEach(m => movements.push({
-    id: m.id,
-    date: m.date,
     inDetails: m.type === 'in' ? m.details : '',
     inAmount: m.type === 'in' ? Number(m.amount) : 0,
     outDetails: m.type === 'out' ? m.details : '',
-    outAmount: m.type === 'out' ? Number(m.amount) : 0
+    outAmount: m.type === 'out' ? Number(m.amount) : 0,
+    cashier: m.cashier || '—',
+    date: m.date,
+    id: m.id
   }));
 
   return movements;
@@ -2139,12 +2226,14 @@ async function saveCashMovementsToSupabase() {
   }
 
   const payload = movements.map(m => ({
-    id: m.id,             // use unique id
-    date: m.date,
+               // use unique id
     in_details: m.inDetails || null,
     in_amount: Number(m.inAmount) || 0,
     out_details: m.outDetails || null,
-    out_amount: Number(m.outAmount) || 0
+    out_amount: Number(m.outAmount) || 0,
+     cashier: m.cashier || '—',
+      date: m.date,
+      id: m.id
   }));
 
   const { error } = await supabaseClient
@@ -2227,9 +2316,14 @@ autoRefreshAll();
 
 
 
+function goToCashOnHand() {
+  // Hide current section if needed
+  document.getElementById('expenses').scrollIntoView({ behavior: 'smooth' });
 
-//SUMMARY
-
+  // Show cash on hand section
+  const cashSection = document.getElementById('cashonhand');
+  if(cashSection) cashSection.style.display = 'block';
+}
 
 
 </script>
