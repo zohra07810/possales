@@ -5,6 +5,8 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#06812b">
 <link rel="icon" href="baigsLogo.png" type="image/png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
+
 
 <title>POS – Main Page</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -194,6 +196,58 @@ button:active {
 }
 
 
+
+/* ===== CAROUSEL ===== */
+#carousel {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.menu-page {
+  display: none;
+  width: 100%;
+  max-width: 600px;
+}
+
+.menu-page.active {
+  display: block;
+}
+
+/* ===== IMAGE + HOTSPOTS ===== */
+.image-wrapper {
+  position: relative;
+}
+
+#menuImage {
+  width: 90%;
+  max-width: 400px;   /* adjust for mobile */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+
+#sizePanel {
+  margin-top: 10px;
+}
+
+
+#carouselContainer img {
+  width: 100%;
+  height: auto;
+}
+
+#sizeDropdown, #addToCartBtn {
+  padding: 10px;
+  font-size: 16px;
+  margin: 5px;
+}
+
+button {
+  outline: none;
+}
+
 </style>
 </head>
 <body  style="background-color: #e0e4cd;">
@@ -286,6 +340,156 @@ if (localStorage.getItem("adminLoggedIn") !== "true") {
  <h2 style="color: #06812b;">Menu</h2>
   <div id="menuItems"></div>
 </div>
+<div id="carouselContainer" style="position:relative; text-align:center; max-width:400px; margin:0 auto;">
+  <img src="images/menusize.jpg" usemap="#menu-map-1" id="carouselImage" style="width:100%; height:auto; display:block;">
+
+  <!-- Previous/Next arrows -->
+  <button id="prevBtn" style="position:absolute; top:50%; left:0; transform:translateY(-50%); font-size:24px; background:none; border:none; cursor:pointer;">&#10094;</button>
+  <button id="nextBtn" style="position:absolute; top:50%; right:0; transform:translateY(-50%); font-size:24px; background:none; border:none; cursor:pointer;">&#10095;</button>
+</div>
+
+<!-- Image Maps -->
+<map name="menu-map-2">
+  <area alt="Chicken Biryani" coords="361,1094,20,370" shape="rect">
+  <area alt="Beef Biryani"  coords="365,373,689,1081" shape="rect">
+  <area alt="Mutton Biryani" coords="701,375,1026,1083" shape="rect">
+  <area alt="Shrimp Biryani" coords="1033,380,1364,1083" shape="rect">
+  <area alt="beef Mandi" coords="10,1386,294,1971" shape="rect">
+  <area alt="mutton Mandi" coords="301,1388,574,1970" shape="rect">
+  <area alt="shrimp Mandi" coords="582,1390,852,1977" shape="rect">
+  <area alt="chicken Mandi" coords="858,1392,1143,1973" shape="rect">
+</map>
+
+<map name="menu-map-3">
+  <area alt="Chicken Kabsah" coords="12,82,570,949" shape="rect">
+  <area alt="Beef Kabsah" coords="573,367,900,962" shape="rect">
+  <area alt="Mutton Kabsah" coords="906,369,1224,939" shape="rect">
+  <area alt="Shrimp Kabsah" coords="1229,370,1543,946" shape="rect">
+  <area  alt="Chicken Maqloobah" coords="10,1388,386,1967" shape="rect">
+  <area  alt="Beef Maqloobah"  coords="402,1391,765,1971" shape="rect">
+  <area  alt="Mutton Maqloobah"coords="777,1394,1151,1969" shape="rect">
+ <area alt="Shrimp Maqloobah" coords="1159,1390,1527,1977" shape="rect">
+</map>
+
+<map name="menu-map-4">
+   <area  alt="Beef Masala" coords="38,493,379,634" shape="rect">
+    <area alt="Chicken Masala" coords="23,673,398,813" shape="rect">
+    <area  alt="Mutton Masala" coords="24,843,379,984" shape="rect">
+    <area  alt="Egg Masala"  coords="35,1018,375,1158" shape="rect">
+    <area alt="Beef Curry"  coords="439,501,768,639" shape="rect">
+    <area  alt="Chicken Curry"  coords="427,674,794,806" shape="rect">
+    <area  alt="Mutton Curry"  coords="432,854,783,974" shape="rect">
+    <area  alt="Egg Curry"  coords="435,1029,772,1149" shape="rect">
+    <area alt="Beef Korma"  coords="844,482,1183,618" shape="rect">
+    <area  alt="Chicken Korma"  coords="829,673,1196,798" shape="rect">
+    <area  alt="Mutton Korma"  coords="833,846,1177,984" shape="rect">
+    <area  alt="Egg Korma" coords="840,1014,1173,1142" shape="rect">
+    <area  alt="Beef Nihari"coords="1226,475,1529,614" shape="rect">
+    <area alt="Chicken Nihari"  coords="1218,669,1529,816" shape="rect">
+    <area  alt="Mutton Nihari"  coords="1210,841,1516,981" shape="rect">
+    <area  alt="Egg Nihari"  coords="1214,1008,1518,1156" shape="rect">
+    <area alt="Beef Shawarma"  coords="43,1380,264,1527" shape="rect">
+    <area  alt="Chicken Shawarma"  coords="339,1373,684,1528" shape="rect">
+    <area  alt="Egg Shawarma" coords="201,1557,410,1700" shape="rect">
+    <area  alt="Hummus"  coords="39,1766,779,1980" shape="rect">
+    <area  alt="Plain Haleem"  coords="848,1654,1110,1771" shape="rect">
+    <area  alt="Haleem Chicken" coords="1165,1643,1495,1766" shape="rect">
+    <area alt="Haleem Beef" coords="870,1839,1076,1966" shape="rect">
+    <area alt="Haleem Mutton"  coords="1195,1833,1520,1958" shape="rect">
+</map>
+
+
+<map name="menu-map-5">
+  <area  alt="Bhindi" coords="53,172,512,653" shape="rect">
+    <area  alt="Vegetable Biryani"  coords="721,225,1413,584" shape="rect">
+    <area  alt="Karela" coords="55,702,502,1103" shape="rect">
+    <area alt="Loki Kaddo" coords="597,639,1023,1092" shape="rect">
+    <area  alt="Mixed Veggies" title="Mixed Veggies" href="" coords="1053,647,1435,1084" shape="rect">
+    <area alt="Beef Shawarma Rice" title="Beef Shawarma Rice" href="" coords="517,1526,869,1959" shape="rect">
+    <area alt="Chicken Shawarma Rice" title="Chicken Shawarma Rice" href="" coords="878,1528,1192,1949" shape="rect">
+    <area  alt="Mixed Shawarma Rice" title="Mixed Shawarma Rice" href="" coords="1199,1532,1499,1898" shape="rect">
+</map>
+
+
+<map name="menu-map-6">
+  <area  alt="Chicken Kabab w/ Khubz" title="Chicken Kabab w/ Khubz" href="" coords="259,273,558,874" shape="rect">
+    <area  alt="Beef Kabab w/ Khubz" title="Beef Kabab w/ Khubz" href="" coords="265,891,559,1429" shape="rect">
+    <area  alt="Mixed Kabab w/ Khubz" title="Mixed Kabab w/ Khubz" href="" coords="259,1458,553,1980" shape="rect">
+    <area  alt="Chicken Kabab w/ Rice" title="Chicken Kabab w/ Rice" href="" coords="788,878,567,274" shape="rect">
+    <area  alt="Beef Kabab w/ Rice" title="Beef Kabab w/ Rice" href="" coords="571,896,780,1428" shape="rect">
+    <area  alt="Mixed Kabab w/ Rice" title="Mixed Kabab w/ Rice" href="" coords="570,1462,784,1985" shape="rect">
+    <area  alt="Chicken Tikkah w/ Rice" title="Chicken Tikkah w/ Rice" href="" coords="1342,274,1542,872" shape="rect">
+    <area  alt="Beef Tikkah w/ Rice" title="Beef Tikkah w/ Rice" href="" coords="1355,894,1544,1433" shape="rect">
+    <area  alt="Mixed Tikkah w/ Rice" title="Mixed Tikkah w/ Rice" href="" coords="1355,1459,1537,1985" shape="rect">
+    <area  alt="Chicken Tikkah w/ Khubz" title="Chicken Tikkah w/ Khubz" href="" coords="1027,276,1334,864" shape="rect">
+    <area  alt="Beef Tikkah w/ Khubz" title="Beef Tikkah w/ Khubz" href="" coords="1022,893,1340,1438" shape="rect">
+    <area alt="Mixed Tikkah w/ Khubz" title="Mixed Tikkah w/ Khubz" href="" coords="1323,1996,1027,1461" shape="rect">
+</map>
+
+<map name="menu-map-7">
+  <area  alt="Broasted Chicken" title="Broasted Chicken" href="" coords="472,29,1537,434" shape="rect">
+    <area  alt="Pastil" title="Pastil" href="" coords="32,467,813,740" shape="rect">
+    <area  alt="Mixed Chicken &amp; Beef" title="Mixed Chicken &amp; Beef" href="" coords="32,983,353,1455" shape="rect">
+    <area  alt="Mixed Beef &amp; Mutton" title="Mixed Beef &amp; Mutton" href="" coords="368,986,697,1466" shape="rect">
+    <area alt="Mixed Mutton &amp; Chicken" title="Mixed Mutton &amp; Chicken" href="" coords="702,990,1037,1480" shape="rect">
+    <area alt="Mixed Chicken &amp; Shrimp" title="Mixed Chicken &amp; Shrimp" href="" coords="31,1477,361,1922" shape="rect">
+    <area  alt="Mixed Beef &amp; Shrimp" title="Mixed Beef &amp; Shrimp" href="" coords="371,1485,690,1926" shape="rect">
+    <area  alt="Mixed Mutton &amp; Shrimp" title="Mixed Mutton &amp; Shrimp" href="" coords="702,1491,1041,1932" shape="rect">
+    <area  alt="Mixed Chicken Beef Mutton &amp; Shrimp" title="Mixed Chicken Beef Mutton &amp; Shrimp" href="" coords="1060,1343,1492,1554" shape="rect">
+    <area  alt="Mixed Chicken Beef &amp; Mutton" title="Mixed Chicken Beef &amp; Mutton" href="" coords="1060,1002,1494,1328" shape="rect">
+</map>
+
+<map name="menu-map-8">
+  <area  alt="Soda" title="Soda" href="" coords="39,227,444,510" shape="rect">
+    <area  alt="Chappati" title="Chappati" href="" coords="488,205,802,411" shape="rect">
+    <area  alt="Paratha" title="Paratha" href="" coords="810,157,1155,573" shape="rect">
+    <area  alt="Khuboos" title="Khuboos" href="" coords="1176,165,1531,565" shape="rect">
+    <area  alt="Mango Shake" title="Mango Shake" href="" coords="12,718,255,793" shape="rect">
+    <area  alt="Banana Shake" title="Banana Shake" href="" coords="3,805,297,899" shape="rect">
+    <area alt="Yogurt Shake" title="Yogurt Shake" href="" coords="3,910,283,992" shape="rect">
+    <area  alt="Cookies &amp; Cream Shake" title="Cookies &amp; Cream Shake" href="" coords="286,718,545,801" shape="rect">
+    <area  alt="Flavored Yogurt Shake" title="Flavored Yogurt Shake" href="" coords="311,877,515,999" shape="rect">
+    <area  alt="Samosa" title="Samosa" href="" coords="1005,596,1488,1259" shape="rect">
+    <area alt="Lassi" title="Lassi" href="" coords="133,1405,343,1500" shape="rect">
+    <area  alt="Lassi w/ Flavor" title="Lassi w/ Flavor" href="" coords="55,1545,496,1652" shape="rect">
+    <area  alt="Lemonade" title="Lemonade" href="" coords="36,1103,514,1302" shape="rect">
+    <area  alt="Gulab Jamun" title="Gulab Jamun" href="" coords="583,771,975,1179" shape="rect">
+    <area  alt="Biryani Rice" title="Biryani Rice" href="" coords="896,1411,1243,1487" shape="rect">
+    <area  alt="Garlic Sauce" title="Garlic Sauce" href="" coords="881,1512,1267,1579" shape="rect">
+    <area  alt="Hot Sauce" title="Hot Sauce" href="" coords="885,1599,1214,1662" shape="rect">
+    <area alt="Fries" title="Fries" href="" coords="1301,1403,1476,1474" shape="rect">
+    <area  alt="Palapa" title="Palapa" href="" coords="551,1770,843,1921" shape="rect">
+    <area  alt="Raita" title="Raita" href="" coords="862,1760,1147,1936" shape="rect">
+    <area alt="Salatah" title="Salatah" href="" coords="1196,1737,1524,1940" shape="rect">
+    <area  alt="Hot Chai" title="Hot Chai" href="" coords="91,1722,381,1853" shape="rect">
+    <area  alt="Coffee" title="Coffee" href="" coords="100,1875,345,1972" shape="rect">
+</map>
+
+
+<map name="menu-map-9">
+    <area alt="Combos" title="ComboAH" href="" coords="14,12,702,958" shape="rect">
+    <area alt="Combo" title="ComboIL" href="" coords="811,26,1524,954" shape="rect">
+    <area alt="ComboNo." title="ComboNo." href="" coords="3,1040,706,1980" shape="rect">
+    <area alt="ComboNum" title="ComboNum" href="" coords="813,1048,1535,1984" shape="0">
+</map>
+
+
+
+
+
+
+<!-- SIZE DROPDOWN -->
+<div id="sizePanel" style="text-align:center; margin-top:10px;">
+  <p id="selectedVariant" style="font-weight:bold; display:none;"></p>
+  <select id="sizeDropdown" style="display:none;">
+    <option value="">Select Size</option>
+  </select>
+  <button id="addToCartBtn" style="display:none;">Add to Cart</button>
+</div>
+
+
+
+
 
 <div class="cart" >
   <h2>Cart</h2>
@@ -310,7 +514,8 @@ if (localStorage.getItem("adminLoggedIn") !== "true") {
     <input type="number" id="discount" value="0" min="0" style="width: 60px;">
   </div>
 
-<!-- SERVICE TYPE -->
+
+  <!-- SERVICE TYPE -->
 <div style="margin-top:10px;">
   <label>Service Type:</label>
   <select id="serviceSelect">
@@ -321,6 +526,12 @@ if (localStorage.getItem("adminLoggedIn") !== "true") {
   </select>
 </div>
 
+<!-- CASHIER -->
+<div style="margin-top:10px;">
+  <label>Cashier Name:</label>
+  <input type="text" id="cashierInput" placeholder="Enter cashier name" style="width: 150px; padding: 4px; font-size: 14px;">
+
+  
 <!-- DELIVERY FEE (HIDDEN BY DEFAULT) -->
 <div id="deliveryFeeRow" style="display:none; margin-top:10px;">
   <label>Delivery Fee:</label>
@@ -334,6 +545,7 @@ if (localStorage.getItem("adminLoggedIn") !== "true") {
 <h3>Total: ₱<span id="total">0.00</span></h3>
 
 
+</div>
 
 
 </div>
@@ -392,129 +604,86 @@ if (localStorage.getItem("adminLoggedIn") !== "true") {
 </div>
 
 <script>
+
+
 const menu = {
   "Biryani": {
-    "Chicken": { "Student": 125, "Budget": 240, "Solo": 365, "Regular": 490, "Medium": 615,"Large": 740,  "Jumbo": 865, "Bilao 12": 1355, "Bilao 14": 1970, "Bilao 16": 2710, "Bilao 18": 3575},
+    "Chicken Biryani": {
+        "Student": 125, "Budget": 240, "Solo": 365, "Regular": 490, "Medium": 615,"Large": 740,  "Jumbo": 865, "Bilao 12": 1355, "Bilao 14": 1970, "Bilao 16": 2710, "Bilao 18": 3575
+    },
+    "Beef Biryani": { "Student": 135, "Budget": 260, "Solo": 395, "Regular": 530, "Medium": 665,"Large": 800,"Jumbo": 935, "Bilao 12": 1465, "Bilao 14": 2130, "Bilao 16": 2930, "Bilao 18": 3865},
 
-    "Beef": { "Student": 135, "Budget": 260, "Solo": 395, "Regular": 530, "Medium": 665,"Large": 800,"Jumbo": 935, "Bilao 12": 1465, "Bilao 14": 2130, "Bilao 16": 2930, "Bilao 18": 3865},
+    "Mutton Biryani": {"Budget": 314, "Solo": 448, "Regular": 582, "Medium": 716,"Large": 850,"Jumbo": 984, "Bilao 12": 1551, "Bilao 14": 2252, "Bilao 16": 3072, "Bilao 18": 4041},
 
-    "Mutton": {"Budget": 314, "Solo": 448, "Regular": 582, "Medium": 716,"Large": 850,"Jumbo": 984, "Bilao 12": 1551, "Bilao 14": 2252, "Bilao 16": 3072, "Bilao 18": 4041},
+    "Shrimp Biryani": { "Student": 145, "Budget": 280, "Solo": 425, "Regular": 560, "Medium": 695,"Large": 830,"Jumbo": 965, "Bilao 12": 1525, "Bilao 14": 2220, "Bilao 16": 3050, "Bilao 18": 4015},
 
-    "Shrimp": { "Student": 145, "Budget": 280, "Solo": 425, "Regular": 560, "Medium": 695,"Large": 830,"Jumbo": 965, "Bilao 12": 1525, "Bilao 14": 2220, "Bilao 16": 3050, "Bilao 18": 4015},
-     
   },
+
+  "Mandi": {
+    "chicken Mandi":  { "Student": 140, "Budget": 255, "Solo": 380, "Regular": 505, "Medium": 630,"Large": 755,  "Jumbo": 880, "Bilao 12": 1385, "Bilao 14": 1970, "Bilao 16": 2710, "Bilao 18": 3575},
+
+    "beef Mandi": { "Student": 135, "Budget": 260, "Solo": 395, "Regular": 530, "Medium": 680,"Large": 800,"Jumbo": 935, "Bilao 12": 1465, "Bilao 14": 2130, "Bilao 16": 2930, "Bilao 18": 3865},
+
+    "mutton Mandi": {"Budget": 314, "Solo": 448, "Regular": 582, "Medium": 716,"Large": 850,"Jumbo": 984, "Bilao 12": 1551, "Bilao 14": 2252, "Bilao 16": 3072, "Bilao 18": 4041},
+
+    "shrimp Mandi": { "Student": 145, "Budget": 280, "Solo": 425, "Regular": 560, "Medium": 695,"Large": 830,"Jumbo": 965, "Bilao 12": 1525, "Bilao 14": 2220, "Bilao 16": 3050, "Bilao 18": 4015},
+  },
+
 
   "Kabsah": {
-    "Chicken": { "Small": 195, "Medium": 395, "Large" : 799,  },
+    "Chicken Kabsah": { "Small": 195, "Medium": 395, "Large": 799},
 
-    "Beef": { "Student": 135, "Budget": 260, "Solo": 395, "Regular": 530, "Medium": 665,"Large": 800,"Jumbo": 935, "Bilao 12": 1465, "Bilao 14": 2130, "Bilao 16": 2930, "Bilao 18": 3865},
+    "Beef Kabsah": { "Student": 135, "Budget": 260, "Solo": 395, "Regular": 530, "Medium": 665,"Large": 800,"Jumbo": 935, "Bilao 12": 1465, "Bilao 14": 2130, "Bilao 16": 2930, "Bilao 18": 3865},
 
-    
-    "Mutton": {"Budget": 314, "Solo": 448, "Regular": 582, "Medium": 716,"Large": 850,"Jumbo": 984, "Bilao 12": 1551, "Bilao 14": 2252, "Bilao 16": 3072, "Bilao 18": 4041},
+    "Mutton Kabsah": {"Budget": 314, "Solo": 448, "Regular": 582, "Medium": 716,"Large": 850,"Jumbo": 984, "Bilao 12": 1551, "Bilao 14": 2252, "Bilao 16": 3072, "Bilao 18": 4041},
 
-     "Shrimp": { "Student": 145, "Budget": 280, "Solo": 425, "Regular": 560, "Medium": 695,"Large": 830,"Jumbo": 965, "Bilao 12": 1525, "Bilao 14": 2220, "Bilao 16": 3050, "Bilao 18": 4015},
-    
+     "Shrimp Kabsah": { "Student": 145, "Budget": 280, "Solo": 425, "Regular": 560, "Medium": 695,"Large": 830,"Jumbo": 965, "Bilao 12": 1525, "Bilao 14": 2220, "Bilao 16": 3050, "Bilao 18": 4015},
+
   },
 
-   "Mandi": {
-    "Chicken": { "Student": 140, "Budget": 255, "Solo": 380, "Regular": 505, "Medium": 630,"Large": 755,  "Jumbo": 880, "Bilao 12": 1385, "Bilao 14": 1970, "Bilao 16": 2710, "Bilao 18": 3575},
-
-    "Beef": { "Student": 135, "Budget": 260, "Solo": 395, "Regular": 530, "Medium": 680,"Large": 800,"Jumbo": 935, "Bilao 12": 1465, "Bilao 14": 2130, "Bilao 16": 2930, "Bilao 18": 3865},
-
-    
-    "Mutton": {"Budget": 314, "Solo": 448, "Regular": 582, "Medium": 716,"Large": 850,"Jumbo": 984, "Bilao 12": 1551, "Bilao 14": 2252, "Bilao 16": 3072, "Bilao 18": 4041},
-
-     "Shrimp": { "Student": 145, "Budget": 280, "Solo": 425, "Regular": 560, "Medium": 695,"Large": 830,"Jumbo": 965, "Bilao 12": 1525, "Bilao 14": 2220, "Bilao 16": 3050, "Bilao 18": 4015},
-    
-  },
-
-
-   "Maqloobah": {
-    "Chicken": { "Student": 160, "Budget": 275, "Solo": 400, "Regular": 525, "Medium": 650,"Large": 775,  "Jumbo": 900, "Bilao 12": 1390, "Bilao 14": 2005, "Bilao 16": 2745, "Bilao 18": 3610},
-
-    "Beef": { "Student": 165, "Budget": 295, "Solo": 430, "Regular": 565, "Medium": 700,"Large": 835,"Jumbo": 970, "Bilao 12": 1500, "Bilao 14": 2165, "Bilao 16": 2965, "Bilao 18": 3900},
-
-    
-    "Mutton": {"Budget": 349, "Solo": 483, "Regular": 617, "Medium": 751,"Large": 885,"Jumbo": 1019, "Bilao 12": 1586, "Bilao 14": 2287, "Bilao 16": 3107, "Bilao 18": 4076},
-
-     "Shrimp": { "Student": 180, "Budget": 297, "Solo": 424, "Regular": 551, "Medium": 678,"Large": 805,"Jumbo": 932, "Bilao 12": 1448, "Bilao 14": 2091, "Bilao 16": 2861, "Bilao 18": 3758},
-    
-  },
-
-   "Kabab": {
-    "Chicken w/ Khubz": {"Budget": 155, "Solo": 232, "Regular": 387, "Medium": 615,"Large": 844,  "Jumbo": 1073, "Bilao 12": 1532, "Bilao 16": 3439},
-
-    "Chicken w/ Rice":{"Budget": 193, "Solo": 294, "Regular": 491, "Medium": 779,"Large": 1068,  "Jumbo": 1357, "Bilao 12": 2133, "Bilao 16": 4552},
-    
-    "Beef w/ Khubz":{"Budget": 219, "Solo":333, "Regular": 554, "Medium": 882,"Large": 1211,  "Jumbo": 1539, "Bilao 12": 2418, "Bilao 16": 5158},
-
-     "Beef w/ Rice":{"Budget": 251, "Solo":383, "Regular": 625, "Medium": 999,"Large": 1371,  "Jumbo": 1744, "Bilao 12": 2737, "Bilao 16": 5843},
-
-     "Mixed Chicken&Beef w/ Khubz":{"Budget": 189, "Solo":300, "Regular": 491, "Medium": 758,"Large": 1057,  "Jumbo": 1326, "Bilao 12": 2081, "Bilao 16": 4464},
-
-     "Mixed Chicken&Beef w/ Rice":{"Budget": 221, "Solo":352, "Regular": 578, "Medium": 902,"Large": 1254,  "Jumbo": 1605, "Bilao 12": 2479, "Bilao 16": 5278},
-  },
   
+   "Maqloobah": {
+    "Chicken Maqloobah": { "Student": 160, "Budget": 275, "Solo": 400, "Regular": 525, "Medium": 650,"Large": 775,  "Jumbo": 900, "Bilao 12": 1390, "Bilao 14": 2005, "Bilao 16": 2745, "Bilao 18": 3610},
 
-  "Tikkah": {
-    "Chicken w/ Khubz": {"Budget": 155, "Solo": 232, "Regular": 387, "Medium": 615,"Large": 844,  "Jumbo": 1073, "Bilao 12": 1532, "Bilao 16": 3439},
+    "Beef Maqloobah": { "Student": 165, "Budget": 295, "Solo": 430, "Regular": 565, "Medium": 700,"Large": 835,"Jumbo": 970, "Bilao 12": 1500, "Bilao 14": 2165, "Bilao 16": 2965, "Bilao 18": 3900},
 
-    "Chicken w/ Rice":{"Budget": 193, "Solo": 294, "Regular": 491, "Medium": 779,"Large": 1068,  "Jumbo": 1357, "Bilao 12": 2133, "Bilao 16": 4552},
-    
-    "Beef w/ Khubz":{"Budget": 219, "Solo":333, "Regular": 554, "Medium": 882,"Large": 1211,  "Jumbo": 1539, "Bilao 12": 2418, "Bilao 16": 5158},
+    "Mutton Maqloobah": {"Budget": 349, "Solo": 483, "Regular": 617, "Medium": 751,"Large": 885,"Jumbo": 1019, "Bilao 12": 1586, "Bilao 14": 2287, "Bilao 16": 3107, "Bilao 18": 4076},
 
-     "Beef w/ Rice":{"Budget": 251, "Solo":383, "Regular": 625, "Medium": 999,"Large": 1371,  "Jumbo": 1744, "Bilao 12": 2737, "Bilao 16": 5843},
+     "Shrimp Maqloobah": { "Student": 180, "Budget": 297, "Solo": 424, "Regular": 551, "Medium": 678,"Large": 805,"Jumbo": 932, "Bilao 12": 1448, "Bilao 14": 2091, "Bilao 16": 2861, "Bilao 18": 3758},
 
-     "Mixed Chicken&Beef w/ Khubz":{"Budget": 189, "Solo":300, "Regular": 491, "Medium": 758,"Large": 1057,  "Jumbo": 1326, "Bilao 12": 2081, "Bilao 16": 4464},
-
-     "Mixed Chicken&Beef w/ Rice":{"Budget": 221, "Solo":352, "Regular": 578, "Medium": 902,"Large": 1254,  "Jumbo": 1605, "Bilao 12": 2479, "Bilao 16": 5278},
   },
 
 
-  "Broasted": {
-    "Chicken": {"Solo": 138, "Regular": 271, "Medium": 406,"Large": 539,  "Jumbo": 672, "Extra Jumbo": 806},
-  },
-
-   "Pastil": {
-    "Plain Rice": { "1 serving": 49 },
-    "Yellow Rice": { "1 serving": 69 }
-  },  
-
-    "Mixed Biryani/Kabsah/Mandi": {
-    "Chicken & Beef":  {"Solo": 500, "Regular": 635, "Medium": 760,"Large": 1020,"Jumbo": 1155, "Bilao 12": 1405, "Bilao 14": 1675, "Bilao 16": 2330, "Bilao 18": 4100},
-    "Beef & Mutton":  {"Solo": 574, "Regular": 708, "Medium": 843,"Large": 1112,"Jumbo": 1246, "Bilao 12": 1515, "Bilao 14": 1784, "Bilao 16": 2486, "Bilao 18": 4382},
-    "Mutton & Chicken":  {"Solo": 554, "Regular": 688, "Medium": 813,"Large": 1072,"Jumbo": 1206, "Bilao 12": 1465, "Bilao 14": 1724, "Bilao 16": 2416, "Bilao 18": 4222},
-    "Chicken & Shrimp":  {"Solo": 520, "Regular": 665, "Medium": 790,"Large": 1050,"Jumbo": 1185, "Bilao 12": 1445, "Bilao 14": 1705, "Bilao 16": 2390, "Bilao 18": 4190},
-    "Beef & Shrimp ":  {"Solo": 540, "Regular": 685, "Medium": 820,"Large": 1090,"Jumbo": 1225, "Bilao 12": 1495, "Bilao 14": 1765, "Bilao 16": 2460, "Bilao 18": 4350},
-    "Mutton & Shrimp":  {"Solo": 594, "Regular": 739, "Medium": 873,"Large": 1142,"Jumbo": 1277, "Bilao 12":1546, "Bilao 14": 1815, "Bilao 16": 2509, "Bilao 18": 4472},
-  },
-
-  "Masala": {
-    "Chicken":{"Budget": 189, "Solo": 288, "Regular": 365, "Medium": 452,"Large": 545,  "Jumbo": 632, "Extra Jumbo": 980},
-    "Beef":{"Budget": 222, "Solo": 336, "Regular": 405, "Medium": 502,"Large": 605,  "Jumbo": 702, "Extra Jumbo": 1040},
-    "Mutton":{"Budget": 276, "Solo": 415, "Regular": 690, "Medium": 961,"Large": 1232,  "Jumbo": 1503, "Extra Jumbo": 2193},
-    "Shrimp":{"Budget": 224, "Solo": 330, "Regular": 391, "Medium": 480,"Large": 575,  "Jumbo": 664, "Extra Jumbo": 1038},
+   "Masala": {
+    "Chicken Masala":{"Budget": 189, "Solo": 288, "Regular": 365, "Medium": 452,"Large": 545,  "Jumbo": 632, "Extra Jumbo": 980},
+    "Beef Masala":{"Budget": 222, "Solo": 336, "Regular": 405, "Medium": 502,"Large": 605,  "Jumbo": 702, "Extra Jumbo": 1040},
+    "Mutton Masala":{"Budget": 276, "Solo": 415, "Regular": 690, "Medium": 961,"Large": 1232,  "Jumbo": 1503, "Extra Jumbo": 2193},
+    "Shrimp Masala":{"Budget": 224, "Solo": 330, "Regular": 391, "Medium": 480,"Large": 575,  "Jumbo": 664, "Extra Jumbo": 1038},
+    "Egg Masala":{"Budget": 80, "Solo": 120, "Regular": 172, "Medium": 288,"Large": 404,  "Jumbo": 520, "Extra Jumbo": 637},
   },
 
    "Korma": {
-    "Chicken":{"Budget": 189, "Solo": 288, "Regular": 365, "Medium": 452,"Large": 545,  "Jumbo": 632, "Extra Jumbo": 980},
-    "Beef":{"Budget": 222, "Solo": 336, "Regular": 405, "Medium": 502,"Large": 605,  "Jumbo": 702, "Extra Jumbo": 1040},
-    "Mutton":{"Budget": 276, "Solo": 415, "Regular": 690, "Medium": 961,"Large": 1232,  "Jumbo": 1503, "Extra Jumbo": 2193},
-    "Shrimp":{"Budget": 224, "Solo": 330, "Regular": 391, "Medium": 480,"Large": 575,  "Jumbo": 664, "Extra Jumbo": 1038}
+    "Chicken Korma":{"Budget": 189, "Solo": 288, "Regular": 365, "Medium": 452,"Large": 545,  "Jumbo": 632, "Extra Jumbo": 980},
+    "Beef Korma":{"Budget": 222, "Solo": 336, "Regular": 405, "Medium": 502,"Large": 605,  "Jumbo": 702, "Extra Jumbo": 1040},
+    "Mutton Korma":{"Budget": 276, "Solo": 415, "Regular": 690, "Medium": 961,"Large": 1232,  "Jumbo": 1503, "Extra Jumbo": 2193},
+    "Shrimp Korma":{"Budget": 224, "Solo": 330, "Regular": 391, "Medium": 480,"Large": 575,  "Jumbo": 664, "Extra Jumbo": 1038},
+    "Egg Korma":{"Budget": 80, "Solo": 120, "Regular": 172, "Medium": 288,"Large": 404,  "Jumbo": 520, "Extra Jumbo": 637},
   },
 
    "Nihari": {
-    "Chicken":{"Budget": 189, "Solo": 288, "Regular": 365, "Medium": 452,"Large": 545,  "Jumbo": 632, "Extra Jumbo": 980},
-    "Beef":{"Budget": 222, "Solo": 336, "Regular": 405, "Medium": 502,"Large": 605,  "Jumbo": 702, "Extra Jumbo": 1040},
-    "Mutton":{"Budget": 276, "Solo": 415, "Regular": 690, "Medium": 961,"Large": 1232,  "Jumbo": 1503, "Extra Jumbo": 2193},
-    "Shrimp":{"Budget": 224, "Solo": 330, "Regular": 391, "Medium": 480,"Large": 575,  "Jumbo": 664, "Extra Jumbo": 1038}
+    "Chicken Nihari":{"Budget": 189, "Solo": 288, "Regular": 365, "Medium": 452,"Large": 545,  "Jumbo": 632, "Extra Jumbo": 980},
+    "Beef Nihari":{"Budget": 222, "Solo": 336, "Regular": 405, "Medium": 502,"Large": 605,  "Jumbo": 702, "Extra Jumbo": 1040},
+    "Mutton Nihari":{"Budget": 276, "Solo": 415, "Regular": 690, "Medium": 961,"Large": 1232,  "Jumbo": 1503, "Extra Jumbo": 2193},
+    "Shrimp Nihari":{"Budget": 224, "Solo": 330, "Regular": 391, "Medium": 480,"Large": 575,  "Jumbo": 664, "Extra Jumbo": 1038},
+    "Egg Nihari":{"Budget": 80, "Solo": 120, "Regular": 172, "Medium": 288,"Large": 404,  "Jumbo": 520, "Extra Jumbo": 637},
   },
 
    "Curry": {
-    "Chicken":{"Budget": 189, "Solo": 288, "Regular": 365, "Medium": 452,"Large": 545,  "Jumbo": 632, "Extra Jumbo": 980},
-    "Beef":{"Budget": 222, "Solo": 336, "Regular": 405, "Medium": 502,"Large": 605,  "Jumbo": 702, "Extra Jumbo": 1040},
-    "Mutton":{"Budget": 276, "Solo": 415, "Regular": 690, "Medium": 961,"Large": 1232,  "Jumbo": 1503, "Extra Jumbo": 2193},
-    "Shrimp":{"Budget": 224, "Solo": 330, "Regular": 391, "Medium": 480,"Large": 575,  "Jumbo": 664, "Extra Jumbo": 1038},
+    "Chicken Curry":{"Budget": 189, "Solo": 288, "Regular": 365, "Medium": 452,"Large": 545,  "Jumbo": 632, "Extra Jumbo": 980},
+    "Beef Curry":{"Budget": 222, "Solo": 336, "Regular": 405, "Medium": 502,"Large": 605,  "Jumbo": 702, "Extra Jumbo": 1040},
+    "Mutton Curry":{"Budget": 276, "Solo": 415, "Regular": 690, "Medium": 961,"Large": 1232,  "Jumbo": 1503, "Extra Jumbo": 2193},
+    "Shrimp Curry":{"Budget": 224, "Solo": 330, "Regular": 391, "Medium": 480,"Large": 575,  "Jumbo": 664, "Extra Jumbo": 1038},
+    "Egg Curry":{"Budget": 80, "Solo": 120, "Regular": 172, "Medium": 288,"Large": 404,  "Jumbo": 520, "Extra Jumbo": 637},
   },
 
 
@@ -523,67 +692,271 @@ const menu = {
 },
 
   "Haleem": {
-    "Plain":{"Solo": 158, "Regular": 242, "Medium": 392,"Large": 543,  "Jumbo": 693, "Extra Jumbo": 1021},
-    "Chicken":{"Solo": 226, "Regular": 424, "Medium": 601,"Large": 820,  "Jumbo": 1019, "Extra Jumbo": 1493},
-    "Beef":{"Solo": 300, "Regular": 559, "Medium": 835,"Large": 1077,  "Jumbo": 1335, "Extra Jumbo": 1964},
-    "Mutton":{"Solo": 493, "Regular": 810, "Medium": 1295,"Large": 1779,  "Jumbo": 2263, "Extra Jumbo": 3306},
+    "Plain Haleem":{"Solo": 158, "Regular": 242, "Medium": 392,"Large": 543,  "Jumbo": 693, "Extra Jumbo": 1021},
+    "Haleem Chicken":{"Solo": 226, "Regular": 424, "Medium": 601,"Large": 820,  "Jumbo": 1019, "Extra Jumbo": 1493},
+    "Haleem Beef":{"Solo": 300, "Regular": 559, "Medium": 835,"Large": 1077,  "Jumbo": 1335, "Extra Jumbo": 1964},
+    "Haleem Mutton":{"Solo": 493, "Regular": 810, "Medium": 1295,"Large": 1779,  "Jumbo": 2263, "Extra Jumbo": 3306},
   },
 
 
   "Shawarma": {
-    "Chicken": { "Small": 60, "Large": 85 },
-    "Beef": { "Small": 85, "Large": 110 },
-    "Egg": { "Small": 35, "Large": 60 },
+    "Chicken Shawarma": { "Small": 60, "Large": 85 },
+    "Beef Shawarma": { "Small": 85, "Large": 110 },
+    "Egg Shawarma": { "Small": 35, "Large": 60 },
   },
 
    "Shawarma Rice": {
-    "Chicken":  {"Solo": 137, "Regular": 267, "Medium": 400,"Large": 534,"Jumbo": 667, "Bilao 12": 1239, "Bilao 14": 1856, "Bilao 16": 2629, "Bilao 18": 3864},
-    "Beef":  {"Solo": 159, "Regular": 311, "Medium": 466,"Large": 621,"Jumbo": 776, "Bilao 12": 1064, "Bilao 14": 1594, "Bilao 16": 2257, "Bilao 18": 3318},
-    "Mixed":  {"Bilao 12": 1155, "Bilao 14": 1443, "Bilao 16": 2302, "Bilao 18": 3450}
+    "Chicken Shawarma Rice":  {"Solo": 137, "Regular": 267, "Medium": 400,"Large": 534,"Jumbo": 667, "Bilao 12": 1239, "Bilao 14": 1856, "Bilao 16": 2629, "Bilao 18": 3864},
+    "Beef Shawarma Rice":  {"Solo": 159, "Regular": 311, "Medium": 466,"Large": 621,"Jumbo": 776, "Bilao 12": 1064, "Bilao 14": 1594, "Bilao 16": 2257, "Bilao 18": 3318},
+    "Mixed Shawarma Rice":  {"Bilao 12": 1155, "Bilao 14": 1443, "Bilao 16": 2302, "Bilao 18": 3450}
   },
 
- "Drinks": {
-  "Softdrinks": { "Coke in can": 55, "Sprite in can": 55, "Royal in can": 55, "Pepsi in can": 55, "Mismo": 35},
+  "Veggies": {
+    "Bhindi":{"Budget": 69, "Solo": 105, "Regular": 209, "Medium": 309,"Large": 409,  "Jumbo": 509, "Extra Jumbo": 609},
+
+    "Karela":{"Budget": 69, "Solo": 105, "Regular": 209, "Medium": 309,"Large": 409,  "Jumbo": 509, "Extra Jumbo": 609},
+
+    "Loki Kaddo":{"Budget": 69, "Solo": 105, "Regular": 209, "Medium": 309,"Large": 409,  "Jumbo": 509, "Extra Jumbo": 609},
+
+    "Mixed Veggies":{"Budget": 92, "Solo": 138, "Regular": 271, "Medium": 406,"Large": 539,  "Jumbo": 672, "Extra Jumbo": 806},
+
+   "Vegetable Biryani":{"Budget": 120, "Solo": 179, "Regular": 299, "Medium": 472,"Large": 644,  "Jumbo": 817},
+  },
+
+
+   "Kabab": {
+    "Chicken Kabab w/ Khubz": {"Budget": 155, "Solo": 232, "Regular": 387, "Medium": 615,"Large": 844,  "Jumbo": 1073, "Bilao 12": 1532, "Bilao 16": 3439},
+
+    "Chicken Kabab w/ Rice":{"Budget": 193, "Solo": 294, "Regular": 491, "Medium": 779,"Large": 1068,  "Jumbo": 1357, "Bilao 12": 2133, "Bilao 16": 4552},
+    
+    "Beef Kabab w/ Khubz":{"Budget": 219, "Solo":333, "Regular": 554, "Medium": 882,"Large": 1211,  "Jumbo": 1539, "Bilao 12": 2418, "Bilao 16": 5158},
+
+     "Beef Kabab w/ Rice":{"Budget": 251, "Solo":383, "Regular": 625, "Medium": 999,"Large": 1371,  "Jumbo": 1744, "Bilao 12": 2737, "Bilao 16": 5843},
+
+     "Mixed Kabab w/ Khubz":{"Budget": 189, "Solo":300, "Regular": 491, "Medium": 758,"Large": 1057,  "Jumbo": 1326, "Bilao 12": 2081, "Bilao 16": 4464},
+
+     "Mixed Kabab w/ Rice":{"Budget": 221, "Solo":352, "Regular": 578, "Medium": 902,"Large": 1254,  "Jumbo": 1605, "Bilao 12": 2479, "Bilao 16": 5278},
+  },
+  
+
+  "Tikkah": {
+    "Chicken Tikkah w/ Khubz": {"Budget": 155, "Solo": 232, "Regular": 387, "Medium": 615,"Large": 844,  "Jumbo": 1073, "Bilao 12": 1532, "Bilao 16": 3439},
+
+    "Chicken Tikkah w/ Rice":{"Budget": 193, "Solo": 294, "Regular": 491, "Medium": 779,"Large": 1068,  "Jumbo": 1357, "Bilao 12": 2133, "Bilao 16": 4552},
+    
+    "Beef Tikkah w/ Khubz":{"Budget": 219, "Solo":333, "Regular": 554, "Medium": 882,"Large": 1211,  "Jumbo": 1539, "Bilao 12": 2418, "Bilao 16": 5158},
+
+     "Beef Tikkah w/ Rice":{"Budget": 251, "Solo":383, "Regular": 625, "Medium": 999,"Large": 1371,  "Jumbo": 1744, "Bilao 12": 2737, "Bilao 16": 5843},
+
+     "Mixed Tikkah w/ Khubz":{"Budget": 189, "Solo":300, "Regular": 491, "Medium": 758,"Large": 1057,  "Jumbo": 1326, "Bilao 12": 2081, "Bilao 16": 4464},
+
+     "Mixed Tikkah w/ Rice":{"Budget": 221, "Solo":352, "Regular": 578, "Medium": 902,"Large": 1254,  "Jumbo": 1605, "Bilao 12": 2479, "Bilao 16": 5278},
+  },
+
+
+  "Broasted": {
+    "Broasted Chicken": {"Solo": 138, "Regular": 271, "Medium": 406,"Large": 539,  "Jumbo": 672, "Extra Jumbo": 806}
+  },
+
+   "Pastil": {
+    "Pastil": {"Plain Rice": 49, "Yellow Rice": 69},
+  },  
+
+    "Mixed Biryani/Kabsah/Mandi": {
+    "Mixed Chicken & Beef":  {"Solo": 500, "Regular": 635, "Medium": 760,"Large": 1020,"Jumbo": 1155, "Bilao 12": 1405, "Bilao 14": 1675, "Bilao 16": 2330, "Bilao 18": 4100},
+
+    "Mixed Beef & Mutton":  {"Solo": 574, "Regular": 708, "Medium": 843,"Large": 1112,"Jumbo": 1246, "Bilao 12": 1515, "Bilao 14": 1784, "Bilao 16": 2486, "Bilao 18": 4382},
+
+    "Mixed Mutton & Chicken":  {"Solo": 554, "Regular": 688, "Medium": 813,"Large": 1072,"Jumbo": 1206, "Bilao 12": 1465, "Bilao 14": 1724, "Bilao 16": 2416, "Bilao 18": 4222},
+
+    "Mixed Chicken & Shrimp":  {"Solo": 520, "Regular": 665, "Medium": 790,"Large": 1050,"Jumbo": 1185, "Bilao 12": 1445, "Bilao 14": 1705, "Bilao 16": 2390, "Bilao 18": 4190},
+
+    "Mixed Beef & Shrimp":  {"Solo": 540, "Regular": 685, "Medium": 820,"Large": 1090,"Jumbo": 1225, "Bilao 12": 1495, "Bilao 14": 1765, "Bilao 16": 2460, "Bilao 18": 4350},
+
+    "Mixed Mutton & Shrimp":  {"Solo": 594, "Regular": 739, "Medium": 873,"Large": 1142,"Jumbo": 1277, "Bilao 12":1546, "Bilao 14": 1815, "Bilao 16": 2509, "Bilao 18": 4472},
+
+    "Mixed Chicken Beef Mutton & Shrimp":  {"Bilao 18": 3220},
+
+    "Mixed Chicken Beef & Mutton":  {"Bilao 12":1996, "Bilao 14": 2390, "Bilao 16": 2784, "Bilao 18": 5896},
+
+  },
+
+  "Drinks": {
+  "Soda": { "Coke in can": 55, "Sprite in can": 55, "Royal in can": 55, "Pepsi in can": 55, "Mismo": 35},
   "Bottled Water": { "Small": 15, "Big": 25},
   "Lemonade": { "Small": 79, "Large": 101, "Big": 149, "Pitcher": 250},
-  "Black Chai": { "Cup": 55, "Kettle": 115},
-  "Chai w/ Milk": { "Cup": 70, "Kettle": 135},
-  "Lassi Plain": { "Small": 98, "Large": 159, "Big": 193},
+  "Hot Chai": { "Black-Cup": 55, "Black-Kettle": 115, "Milk-Cup": 70, "Milk-Kettle": 135 },
+  "Lassi": { "Small": 98, "Large": 159, "Big": 193},
   "Lassi w/ Flavor": { "Small": 123, "Large": 185, "Big": 221},
   "Mango Shake": { "Small": 79, "Large": 101, "Big": 149},
   "Banana Shake": { "Small": 79, "Large": 101, "Big": 149},
   "Cookies & Cream Shake": { "Small": 97, "Large": 122, "Big": 157},
+  "Yogurt Shake": { "Small": 99, "Large": 141, "Big": 175},
+  "Flavored Yogurt Shake": { "Small": 124, "Large": 168, "Big": 199},
+  "Coffee": { "Cup": 65},
+
 },
 
 "Pita": {
-  "Chappati": { "1 piece": 25},
+  "Chappati": { "piece": 25},
   "Khuboos": { "Small": 17, "Large": 23, "Small Pack": 165, "Large Pack": 110},
   "Paratha": { "Plain": 55, "w/ Cheese": 65, "w/ Butter": 65, "w/ Sugar": 65, "w/ Garlic": 65, "w/ Egg": 99,"Aloo": 105}, 
 },
 
 "Samosa": {
-   "Plain": { "Plain Veggies":25},
-   "Chicken": { "Chicken & Veggies":35, "Chicken & Veggies w/ cheese":45, "Chicken all meat":40, "Chicken & Cheese":50},
-   "Beef": {"Beef & Veggies":45,"Beef & Veggies w/ Cheese":55,  "Beef all meat":50,  "Beef & Cheese":60}
+   "Samosa": { "Plain Veggies":25, "Chicken & Veggies":35, "Chicken & Veggies w/ cheese":45, "Chicken all meat":40, "Chicken & Cheese":50, "Beef & Veggies":45,"Beef & Veggies w/ Cheese":55,  "Beef all meat":50,  "Beef & Cheese":60},
 },
 
 "Add-ons": {
-  "Rice": { "Biryani": 55,"Kabsah": 55, "White": 35},
+  "Biryani Rice": {"Tub": 55},
   "Fries": { "Small": 25, "Regular": 50, "Medium": 75, "Large": 100, "Jumbo": 125},
   "Garlic Sauce": { "2.5oz": 35, "3.5oz": 45, "250ml": 140},
   "Hot Sauce": { "2.5oz": 35, "3.5oz": 45, "250ml": 140},
   "Salatah": { "2.5oz": 25, "3.5oz": 35, "250ml": 140}, 
   "Raita": { "Tub": 125},
   "Palapa": { "Tub": 199},
+  "Gulab Jamun": { "piece": 55},
 },
 
 "Combos": {
-  "Combo 1-10": {  "Combo 1":99,  "Combo 2":159,   "Combo 3":210, "Combo 4":193,"Combo 5":176,"Combo 6":222,"Combo 7":159,"Combo 8":129,"Combo 9":251,"Combo 10":206},
-  "Combo A-L": {  "Combo A":201,   "Combo B":247,  "Combo C":229,  "Combo D":247,  "Combo E":178,"Combo F":155, "Combo G":155,  "Combo H":133, "Combo i":268, "Combo J":245,"Combo K":237, "Combo L":278,},
+  "Combo": {  "Combo i":268, "Combo J":245,"Combo K":237, "Combo L":278, },
+
+  "Combos": {  "Combo A":201,   "Combo B":247,  "Combo C":229,  "Combo D":247,  "Combo E":178,"Combo F":155, "Combo G":155,  "Combo H":133},
+
+ "ComboNo.": { "Combo 1":99,  "Combo 2":159,   "Combo 3":210, "Combo 4":193,"Combo 5":176,},
+
+"ComboNum": { "Combo 6":222,"Combo 7":159,"Combo 8":129,"Combo 9":251,"Combo 10":206},
   
 }
-  
+
+
+
+
+
+
+
 };
+
+// IMAGE CAROUSEL
+const images = [
+  { src: "images/menusize.jpg", map: "menu-map-1" },  // Biryani + Mandi
+  { src: "images/menu1.png", map: "menu-map-2" },
+  { src: "images/menu2.png", map: "menu-map-3" },
+  { src: "images/menumasala.png", map: "menu-map-4" },
+  { src: "images/menuveg.png", map: "menu-map-5" },
+  { src: "images/menu4.jpg", map: "menu-map-6" },
+  { src: "images/menu7.jpg", map: "menu-map-7" },
+  { src: "images/MENUDRINKS.png", map: "menu-map-8" },
+  { src: "images/menucombo.png", map: "menu-map-9" },
+    
+    
+];
+
+let currentIndex = 0;
+const carouselImage = document.getElementById("carouselImage");
+const sizeDropdown = document.getElementById("sizeDropdown");
+const addToCartBtn = document.getElementById("addToCartBtn");
+
+
+function showImage(index) {
+  currentIndex = index;
+  carouselImage.src = images[index].src;
+  carouselImage.useMap = `#${images[index].map}`;
+
+  // wait for image to load for scaling
+  carouselImage.onload = () => {
+    scaleMap();
+    setupHotspots();
+    document.getElementById("selectedVariant").style.display = "none";
+    sizeDropdown.style.display = "none";
+    addToCartBtn.style.display = "none";
+  };
+}
+
+// PREV / NEXT BUTTONS
+document.getElementById("prevBtn").onclick = () => showImage((currentIndex - 1 + images.length) % images.length);
+document.getElementById("nextBtn").onclick = () => showImage((currentIndex + 1) % images.length);
+
+// SCALE MAP COORDS
+function scaleMap() {
+  const img = carouselImage;
+  const mapName = img.useMap.replace('#','');
+  const map = document.querySelector(`map[name="${mapName}"]`);
+  if(!map) return;
+
+  const scale = img.width / img.naturalWidth;
+
+  map.querySelectorAll('area').forEach(area => {
+    if(!area.dataset.originalCoords) area.dataset.originalCoords = area.coords;
+    const original = area.dataset.originalCoords.split(',').map(Number);
+    const scaled = original.map(c => Math.round(c * scale));
+    area.coords = scaled.join(',');
+  });
+}
+
+// HOTSPOTS
+function setupHotspots() {
+  const mapName = carouselImage.useMap.replace('#','');
+  const map = document.querySelector(`map[name="${mapName}"]`);
+  if(!map) return;
+
+  // Remove old listeners
+  map.querySelectorAll('area').forEach(area => area.replaceWith(area.cloneNode(true)));
+
+  // Add new listeners
+  map.querySelectorAll('area').forEach(area => {
+    area.addEventListener('click', e => {
+      e.preventDefault();
+      openSizes(area.alt);
+    });
+  });
+}
+
+// OPEN SIZES
+function openSizes(variantKey) {
+  let categoryFound = null, sizes = null;
+  for(const cat in menu) {
+    if(menu[cat][variantKey]) { categoryFound = cat; sizes = menu[cat][variantKey]; break; }
+  }
+  if(!sizes) return;
+
+  const selectedVariant = document.getElementById("selectedVariant");
+  selectedVariant.textContent = `Variant: ${variantKey}`;
+  selectedVariant.style.display = "block";
+
+  sizeDropdown.innerHTML = '<option value="">Select Size</option>';
+  Object.keys(sizes).forEach(size => {
+    const price = sizes[size];
+    const option = document.createElement("option");
+    option.value = price;
+    option.dataset.name = `${variantKey} (${size})`;
+    option.textContent = `${size} – ₱${price}`;
+    sizeDropdown.appendChild(option);
+  });
+
+  sizeDropdown.style.display = "inline-block";
+  addToCartBtn.style.display = "inline-block";
+  sizeDropdown.value = "";
+}
+
+// ADD TO CART
+addToCartBtn.onclick = () => {
+  const selectedOption = sizeDropdown.selectedOptions[0];
+  if(!selectedOption || selectedOption.value === "") return;
+
+  const price = parseFloat(selectedOption.value);
+  const name = selectedOption.dataset.name;
+  cart.push({ name, price, qty: 1 });
+  renderCart();
+};
+
+// RENDER CART (example)
+function renderCart() {
+  console.log("Cart:", cart);
+}
+
+// INITIALIZE
+showImage(0);
 
 
 let cart = [];
@@ -621,81 +994,9 @@ deliveryFeeInput.addEventListener("input", () => {
   renderCart();
 });
 
-// =======================
-// MENU RENDERING
-// =======================
-function renderCategories() {
-  menuDiv.innerHTML = '';
-  const title = document.createElement('h3');
-  title.textContent = 'Select Category';
-  menuDiv.appendChild(title);
-
-  Object.keys(menu).forEach(category => {
-    const btn = document.createElement('button');
-    btn.className = 'category-btn';
-    btn.textContent = category;
-    btn.onclick = () => renderVariants(category);
-    menuDiv.appendChild(btn);
-  });
-}
-
-function renderVariants(category) {
-  menuDiv.innerHTML = '';
-  const title = document.createElement('h3');
-  title.textContent = `Category: ${category}`;
-  menuDiv.appendChild(title);
-
-  const backBtn = document.createElement('button');
-  backBtn.className = 'backBtn';
-  backBtn.textContent = '⬅ Back to Categories';
-  backBtn.onclick = () => renderCategories();
-  menuDiv.appendChild(backBtn);
-
-  const variants = menu[category];
-  Object.keys(variants).forEach(variant => {
-    const btn = document.createElement('button');
-    btn.className = 'variant-btn';
-    btn.textContent = variant;
-    btn.onclick = () => renderSizes(category, variant);
-    menuDiv.appendChild(btn);
-  });
-}
-
-function renderSizes(category, variant) {
-  menuDiv.innerHTML = '';
-  const title = document.createElement('h3');
-  title.textContent = `Category: ${category} | Variant: ${variant}`;
-  menuDiv.appendChild(title);
 
 
 
-  // Direct back to main categories
-  const mainBackBtn = document.createElement('button');
-  mainBackBtn.className = 'backBtn';
-  mainBackBtn.textContent = '⬅ Back to Categories';
-  mainBackBtn.onclick = () => renderCategories();
-  menuDiv.appendChild(mainBackBtn);
-
-    // Back to previous variant menu
-  const backBtn = document.createElement('button');
-  backBtn.className = 'backBtn';
-  backBtn.textContent = '⬅ Back';
-  backBtn.onclick = () => renderVariants(category);
-  menuDiv.appendChild(backBtn);
-
-  const sizes = menu[category][variant];
-  Object.keys(sizes).forEach(size => {
-    const price = sizes[size];
-    const btn = document.createElement('button');
-    btn.className = 'size-btn';
-    btn.textContent = `${variant} (${size}) - ₱${price}`;
-    btn.onclick = () => {
-      cart.push({ name: `${category} - ${variant} (${size})`, price, qty: 1 });
-      renderCart();
-    };
-    menuDiv.appendChild(btn);
-  });
-}
 // =======================
 // CART FUNCTIONS
 // =======================
@@ -975,6 +1276,22 @@ document.getElementById("saveCancel").addEventListener("click", closeSaveModal);
   window.location.href = "login.html";
   }
 
+
+
+  //CASHIER
+  const cashierInput = document.getElementById("cashierInput");
+
+// Load saved cashier (if any)
+cashierInput.value = localStorage.getItem("cashier") || "";
+
+// Save on input
+cashierInput.addEventListener("input", () => {
+  localStorage.setItem("cashier", cashierInput.value);
+});
+
+
+
+
 </script>
 
 <script>
@@ -985,11 +1302,12 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.error('Service Worker registration failed:', err));
   });
 }
+
+window.addEventListener("load", () => {
+  imageMapResize();
+});
+
 </script>
 
 </body>
 </html>
-
-
-
-
